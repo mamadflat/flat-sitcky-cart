@@ -12,6 +12,7 @@ test( 'mobile price and purchase are visible at entry, without scrolling', async
 	await open( page, 'simple' );
 	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
 	await expect( page.locator( '#amc-submit' ) ).toBeEnabled();
+	await expect( page.locator( '.storefront-handheld-footer-bar' ) ).toBeHidden();
 	await expect( page.locator( '#amc-price-value' ) ).toContainText( '100' );
 	expect( await page.evaluate( () => scrollY ) ).toBe( 0 );
 	const rect = await page.locator( '#amc-bar' ).boundingBox();
@@ -90,7 +91,7 @@ test( 'variable purchase prompts options, updates price and adds correct variati
 
 test( 'reset restores range and option-selection action', async ( { page } ) => {
 	await open( page, 'variable' );
-	const initial = await page.locator( '#amc-price-value' ).innerText();
+	const initial = await page.locator( '#amc-price-value' ).textContent();
 	await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
 	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
 	await page.locator( '.reset_variations' ).click();
@@ -155,6 +156,8 @@ test( 'native form remains usable when JavaScript is disabled', async ( { browse
 	const page = await context.newPage();
 	await page.goto( fixtures.simple.url );
 	await expect( page.locator( '#amc-submit' ) ).toBeDisabled();
+	// Like a user scrolling, bring the original form above the fixed footer.
+	await page.locator( 'form.cart' ).evaluate( ( form ) => form.scrollIntoView( { block: 'center' } ) );
 	await page.locator( 'form.cart .single_add_to_cart_button' ).click();
 	await expect( page.locator( '.woocommerce-message' ).first() ).toBeVisible();
 	await context.close();

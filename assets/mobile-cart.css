@@ -89,8 +89,9 @@
 		height: var(--amc-bar-height, 110px);
 	}
 
-	/* Respect Flatsome modal stacking and avoid a second mobile sticky bar. */
-	body:has(#amc-bar) .sticky-add-to-cart--active {
+	/* Replace competing theme footer bars only where this purchase bar exists. */
+	body:has(#amc-bar) .sticky-add-to-cart--active,
+	body:has(#amc-bar) .storefront-handheld-footer-bar {
 		display: none;
 	}
 
