@@ -1,6 +1,9 @@
 // Plugin Check's default command can return zero even when findings exist.
 const fs = require( 'node:fs' );
-const report = JSON.parse( fs.readFileSync( 'plugin-check.json', 'utf8' ) );
+const raw = fs.readFileSync( 'plugin-check.json', 'utf8' ).trim();
+// PCP emits a plain success sentence, even with --format=json, for a clean scan.
+const report = raw === 'Success: Checks complete. No errors found.' ? [] : JSON.parse( raw );
+fs.writeFileSync( 'plugin-check.json', JSON.stringify( report, null, 2 ) + '\n' );
 const findings = [];
 function visit( value ) {
 	if ( ! value || typeof value !== 'object' ) {
