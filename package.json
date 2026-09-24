@@ -1,0 +1,14 @@
+{
+  "name": "abzarak-mobile-cart",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "check:js": "node --check assets/mobile-cart.js",
+    "build:translations": "node tools/translations.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.0",
+    "gettext-parser": "^8.0.0"
+  }
+}

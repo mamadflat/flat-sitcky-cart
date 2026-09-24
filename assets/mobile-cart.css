@@ -1,0 +1,107 @@
+/* Mobile only; do not depend on user-agent detection or scroll position. */
+#amc-bar,
+#amc-spacer {
+	display: none;
+}
+
+@media screen and (max-width: 767px) {
+	#amc-bar {
+		box-sizing: border-box;
+		position: fixed;
+		inset-inline: 0;
+		bottom: 0;
+		z-index: 990;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+		padding-inline-start: max(16px, env(safe-area-inset-left, 0px));
+		padding-inline-end: max(16px, env(safe-area-inset-right, 0px));
+		border-top: 1px solid #e5e7eb;
+		background: #fff;
+		color: #1a1a1a;
+		box-shadow: 0 -3px 16px rgb(0 0 0 / 8%);
+		font-family: inherit;
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	#amc-bar .amc-price {
+		min-width: 0;
+		flex: 1 1 45%;
+		overflow-wrap: anywhere;
+	}
+
+	#amc-bar .amc-price-label {
+		display: block;
+		font-size: 11px;
+		color: #595959;
+	}
+
+	#amc-price-value {
+		font-weight: 700;
+	}
+
+	#amc-price-value del {
+		font-size: 12px;
+		font-weight: 400;
+	}
+
+	#amc-price-value ins {
+		background: transparent;
+		text-decoration: none;
+	}
+
+	#amc-submit {
+		appearance: none;
+		box-sizing: border-box;
+		flex: 0 1 55%;
+		min-height: 48px;
+		margin: 0;
+		padding: 10px 16px;
+		border: 1px solid #e7af24;
+		border-radius: 10px;
+		background: #fec447;
+		color: #1a1a1a;
+		font: inherit;
+		font-weight: 700;
+		letter-spacing: normal;
+		text-transform: none;
+		line-height: 1.6;
+		cursor: pointer;
+	}
+
+	#amc-submit:disabled {
+		background: #e5e7eb;
+		border-color: #d1d5db;
+		color: #595959;
+		cursor: not-allowed;
+	}
+
+	#amc-submit:focus-visible {
+		outline: 3px solid #1a1a1a;
+		outline-offset: 3px;
+	}
+
+	#amc-spacer {
+		display: block;
+		height: var(--amc-bar-height, 110px);
+	}
+
+	/* Respect Flatsome modal stacking and avoid a second mobile sticky bar. */
+	body:has(#amc-bar) .sticky-add-to-cart--active {
+		display: none;
+	}
+
+	body:has(#amc-bar) form.cart {
+		scroll-margin-top: 120px;
+		scroll-margin-bottom: var(--amc-bar-height, 110px);
+	}
+
+	body:has(#amc-bar) form.cart select,
+	body:has(#amc-bar) form.cart input {
+		scroll-margin-top: 120px;
+		scroll-margin-bottom: var(--amc-bar-height, 110px);
+	}
+}

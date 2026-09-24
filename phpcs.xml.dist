@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="Abzarak Mobile Cart">
+  <description>WordPress coding, documentation and security standards.</description>
+  <file>abzarak-mobile-cart.php</file>
+  <arg name="extensions" value="php"/>
+  <arg name="colors"/>
+  <rule ref="WordPress"/>
+  <config name="minimum_supported_wp_version" value="6.5"/>
+  <rule ref="WordPress.WP.I18n">
+    <properties><property name="text_domain" type="array" value="abzarak-mobile-cart"/></properties>
+  </rule>
+  <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+    <properties><property name="prefixes" type="array" value="amc"/></properties>
+  </rule>
+</ruleset>

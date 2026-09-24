@@ -1,0 +1,109 @@
+name: WordPress standards and WooCommerce tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  standards:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+      - run: php -l abzarak-mobile-cart.php
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer lint
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check:js
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: wordpress
+          MYSQL_DATABASE: wordpress
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pwordpress"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli, mbstring, zip, intl, gd
+          tools: wp-cli
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build:translations
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated WordPress and WooCommerce
+        env:
+          WP_CLI_ALLOW_ROOT: '1'
+        run: |
+          mkdir -p /tmp/amc-wp
+          wp core download --path=/tmp/amc-wp
+          wp config create --path=/tmp/amc-wp --dbname=wordpress --dbuser=root --dbpass=wordpress --dbhost=127.0.0.1
+          wp core install --path=/tmp/amc-wp --url=http://127.0.0.1:8080 --title='AMC CI' --admin_user=ci --admin_password='ci-only-password' --admin_email=ci@example.test --skip-email
+          wp plugin install woocommerce --activate --path=/tmp/amc-wp
+          wp theme install storefront --activate --path=/tmp/amc-wp
+          wp language core install fa_IR --activate --path=/tmp/amc-wp
+          wp option update blog_public 0 --path=/tmp/amc-wp
+          ln -s "$GITHUB_WORKSPACE" /tmp/amc-wp/wp-content/plugins/abzarak-mobile-cart
+          wp plugin activate abzarak-mobile-cart --path=/tmp/amc-wp
+          AMC_FIXTURES="$GITHUB_WORKSPACE/tests/fixtures.json" wp eval-file "$GITHUB_WORKSPACE/tests/seed.php" --path=/tmp/amc-wp
+          wp post update $(wp option get woocommerce_cart_page_id --path=/tmp/amc-wp) --post_content='[woocommerce_cart]' --path=/tmp/amc-wp
+          wp post update $(wp option get woocommerce_checkout_page_id --path=/tmp/amc-wp) --post_content='[woocommerce_checkout]' --path=/tmp/amc-wp
+          printf 'WordPress: ' > test-environment.txt
+          wp core version --path=/tmp/amc-wp >> test-environment.txt
+          wp plugin list --path=/tmp/amc-wp --format=table >> test-environment.txt
+          php -v >> test-environment.txt
+          php -S 127.0.0.1:8080 -t /tmp/amc-wp > /tmp/amc-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/ >/dev/null && break || sleep 1; done
+      - name: WordPress Plugin Check
+        run: |
+          wp plugin install plugin-check --activate --path=/tmp/amc-wp
+          wp plugin check abzarak-mobile-cart --path=/tmp/amc-wp
+      - run: npm test
+      - name: Graceful behavior without WooCommerce
+        run: |
+          wp plugin deactivate woocommerce --path=/tmp/amc-wp
+          curl -fsS http://127.0.0.1:8080/ > /tmp/amc-no-woo.html
+          if grep -q 'id="amc-bar"' /tmp/amc-no-woo.html; then exit 1; fi
+      - name: Package installable plugin
+        run: |
+          mkdir -p dist/abzarak-mobile-cart
+          cp abzarak-mobile-cart.php readme.txt LICENSE dist/abzarak-mobile-cart/
+          cp -r assets languages dist/abzarak-mobile-cart/
+          cd dist
+          zip -r abzarak-mobile-cart-0.1.0.zip abzarak-mobile-cart
+      - uses: actions/upload-artifact@v4
+        with:
+          name: abzarak-mobile-cart-plugin
+          path: dist/*.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            playwright-report/
+            test-results/
+            test-environment.txt
+            /tmp/amc-server.log

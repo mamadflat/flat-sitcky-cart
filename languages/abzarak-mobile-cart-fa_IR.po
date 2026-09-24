@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Abzarak Mobile Cart 0.1.0\n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Product purchase"
+msgstr "خرید محصول"
+
+msgid "Price"
+msgstr "قیمت"
+
+msgid "Add to cart"
+msgstr "افزودن به سبد خرید"
+
+msgid "Choose options"
+msgstr "انتخاب گزینه‌ها"
+
+msgid "Unavailable"
+msgstr "ناموجود"
+
+msgid "Use the product form to purchase."
+msgstr "برای خرید از فرم اصلی محصول استفاده کنید."
