@@ -5,17 +5,17 @@ const choose = 'انتخاب گزینه‌ها';
 
 async function open( page, kind ) {
 	await page.goto( fixtures[ kind ].url );
-	await expect( page.locator( '#amc-bar' ) ).toBeVisible();
+	await expect( page.locator( '#fsvt-bar' ) ).toBeVisible();
 }
 
 test( 'mobile price and purchase are visible at entry, without scrolling', async ( { page } ) => {
 	await open( page, 'simple' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
-	await expect( page.locator( '#amc-submit' ) ).toBeEnabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( add );
+	await expect( page.locator( '#fsvt-submit' ) ).toBeEnabled();
 	await expect( page.locator( '.storefront-handheld-footer-bar' ) ).toBeHidden();
-	await expect( page.locator( '#amc-price-value' ) ).toContainText( '100' );
+	await expect( page.locator( '#fsvt-price-value' ) ).toContainText( '100' );
 	expect( await page.evaluate( () => scrollY ) ).toBe( 0 );
-	const rect = await page.locator( '#amc-bar' ).boundingBox();
+	const rect = await page.locator( '#fsvt-bar' ).boundingBox();
 	expect( Math.abs( rect.y + rect.height - 844 ) ).toBeLessThan( 2 );
 	await page.screenshot( { path: 'test-results/mobile-entry.png' } );
 } );
@@ -23,34 +23,34 @@ test( 'mobile price and purchase are visible at entry, without scrolling', async
 test( 'stays fixed while scrolling, reserves footer space, and supports RTL', async ( { page } ) => {
 	await open( page, 'simple' );
 	await expect( page.locator( 'html' ) ).toHaveAttribute( 'dir', 'rtl' );
-	await page.locator( '#amc-spacer' ).scrollIntoViewIfNeeded();
-	const rect = await page.locator( '#amc-bar' ).boundingBox();
+	await page.locator( '#fsvt-spacer' ).scrollIntoViewIfNeeded();
+	const rect = await page.locator( '#fsvt-bar' ).boundingBox();
 	expect( Math.abs( rect.y + rect.height - 844 ) ).toBeLessThan( 2 );
-	const space = await page.locator( '#amc-spacer' ).boundingBox();
+	const space = await page.locator( '#fsvt-spacer' ).boundingBox();
 	expect( space.height ).toBeGreaterThanOrEqual( rect.height - 1 );
 } );
 
 test( 'hidden on desktop, including after resize and scrolling', async ( { page } ) => {
 	await page.setViewportSize( { width: 1440, height: 900 } );
 	await page.goto( fixtures.simple.url );
-	await expect( page.locator( '#amc-bar' ) ).toBeHidden();
-	await expect( page.locator( '#amc-spacer' ) ).toBeHidden();
+	await expect( page.locator( '#fsvt-bar' ) ).toBeHidden();
+	await expect( page.locator( '#fsvt-spacer' ) ).toBeHidden();
 	await page.locator( 'footer' ).first().scrollIntoViewIfNeeded();
-	await expect( page.locator( '#amc-bar' ) ).toBeHidden();
+	await expect( page.locator( '#fsvt-bar' ) ).toBeHidden();
 	await page.setViewportSize( { width: 767, height: 844 } );
-	await expect( page.locator( '#amc-bar' ) ).toBeVisible();
+	await expect( page.locator( '#fsvt-bar' ) ).toBeVisible();
 	await page.setViewportSize( { width: 768, height: 844 } );
-	await expect( page.locator( '#amc-bar' ) ).toBeHidden();
+	await expect( page.locator( '#fsvt-bar' ) ).toBeHidden();
 	await page.screenshot( { path: 'test-results/desktop-no-bar.png' } );
 } );
 
 test( 'fits narrow mobile widths without horizontal overflow', async ( { page } ) => {
 	await page.setViewportSize( { width: 320, height: 700 } );
 	await open( page, 'variable' );
-	const rect = await page.locator( '#amc-bar' ).boundingBox();
+	const rect = await page.locator( '#fsvt-bar' ).boundingBox();
 	expect( rect.x ).toBeGreaterThanOrEqual( 0 );
 	expect( rect.width ).toBeLessThanOrEqual( 320 );
-	const button = await page.locator( '#amc-submit' ).boundingBox();
+	const button = await page.locator( '#fsvt-submit' ).boundingBox();
 	expect( button.height ).toBeGreaterThanOrEqual( 44 );
 	expect( button.x + button.width ).toBeLessThanOrEqual( 320 );
 } );
@@ -58,96 +58,96 @@ test( 'fits narrow mobile widths without horizontal overflow', async ( { page } 
 test( 'simple purchase reaches real WooCommerce cart, preserving quantity', async ( { page } ) => {
 	await open( page, 'simple' );
 	await page.locator( 'form.cart input.qty' ).fill( '2' );
-	await page.locator( '#amc-submit' ).click();
+	await page.locator( '#fsvt-submit' ).click();
 	await expect( page.locator( '.woocommerce-message' ).first() ).toBeVisible();
 	await page.goto( fixtures.cart );
-	await expect( page.locator( 'main' ) ).toContainText( 'AMC simple' );
+	await expect( page.locator( 'main' ) ).toContainText( 'FSVT simple' );
 	await expect( page.locator( 'input.qty' ).first() ).toHaveValue( '2' );
 } );
 
 test( 'invalid native quantity is not submitted', async ( { page } ) => {
 	await open( page, 'simple' );
 	await page.locator( 'form.cart input.qty' ).fill( '0' );
-	await page.locator( '#amc-submit' ).click();
+	await page.locator( '#fsvt-submit' ).click();
 	await expect( page.locator( 'form.cart input.qty' ) ).toBeFocused();
 	await expect( page.locator( '.woocommerce-message' ) ).toHaveCount( 0 );
-	await expect( page.locator( '#amc-submit' ) ).toBeEnabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toBeEnabled();
 } );
 
 test( 'variable purchase prompts options, updates price and adds correct variation', async ( { page } ) => {
 	await open( page, 'variable' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( choose );
-	await page.locator( '#amc-submit' ).click();
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( choose );
+	await page.locator( '#fsvt-submit' ).click();
 	await expect( page.locator( 'select[name="attribute_length"]' ) ).toBeFocused();
 	await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
-	await expect( page.locator( '#amc-price-value' ) ).toContainText( '125' );
-	await page.locator( '#amc-submit' ).click();
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( add );
+	await expect( page.locator( '#fsvt-price-value' ) ).toContainText( '125' );
+	await page.locator( '#fsvt-submit' ).click();
 	await expect( page.locator( '.woocommerce-message' ).first() ).toBeVisible();
 	await page.goto( fixtures.cart );
-	await expect( page.locator( 'main' ) ).toContainText( 'AMC variable' );
+	await expect( page.locator( 'main' ) ).toContainText( 'FSVT variable' );
 	await expect( page.locator( 'main' ) ).toContainText( 'long' );
 } );
 
 test( 'reset restores range and option-selection action', async ( { page } ) => {
 	await open( page, 'variable' );
-	const initial = await page.locator( '#amc-price-value' ).textContent();
+	const initial = await page.locator( '#fsvt-price-value' ).textContent();
 	await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( add );
 	await page.locator( '.reset_variations' ).click();
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( choose );
-	await expect( page.locator( '#amc-price-value' ) ).toHaveText( initial );
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( choose );
+	await expect( page.locator( '#fsvt-price-value' ) ).toHaveText( initial );
 } );
 
 test( 'unavailable variation cannot be purchased', async ( { page } ) => {
 	await open( page, 'variable' );
 	await page.locator( 'select[name="attribute_length"]' ).selectOption( 'unavailable' );
-	await expect( page.locator( '#amc-submit' ) ).toBeDisabled();
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( 'ناموجود' );
+	await expect( page.locator( '#fsvt-submit' ) ).toBeDisabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( 'ناموجود' );
 } );
 
 test( 'default variation resolves after initialization', async ( { page } ) => {
 	await open( page, 'defaults' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
-	await expect( page.locator( '#amc-price-value' ) ).toContainText( '125' );
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( add );
+	await expect( page.locator( '#fsvt-price-value' ) ).toContainText( '125' );
 } );
 
 test( 'WooCommerce AJAX variation lookup updates the bar', async ( { page } ) => {
 	await open( page, 'ajax' );
 	await expect( page.locator( '.variations_form' ) ).toHaveAttribute( 'data-product_variations', 'false' );
 	await page.locator( 'select[name="attribute_length"]' ).selectOption( '2' );
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( add );
-	await expect( page.locator( '#amc-price-value' ) ).toContainText( '125' );
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( add );
+	await expect( page.locator( '#fsvt-price-value' ) ).toContainText( '125' );
 } );
 
 test( 'sold individually works without a visible quantity field', async ( { page } ) => {
 	await open( page, 'individual' );
-	await page.locator( '#amc-submit' ).click();
+	await page.locator( '#fsvt-submit' ).click();
 	await expect( page.locator( '.woocommerce-message' ).first() ).toBeVisible();
 } );
 
 test( 'backorders remain purchasable', async ( { page } ) => {
 	await open( page, 'backorder' );
-	await expect( page.locator( '#amc-submit' ) ).toBeEnabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toBeEnabled();
 } );
 
 test( 'sale prices retain original and discounted amounts', async ( { page } ) => {
 	await open( page, 'sale' );
-	await expect( page.locator( '#amc-price-value del' ) ).toContainText( '100' );
-	await expect( page.locator( '#amc-price-value ins' ) ).toContainText( '75' );
+	await expect( page.locator( '#fsvt-price-value del' ) ).toContainText( '100' );
+	await expect( page.locator( '#fsvt-price-value ins' ) ).toContainText( '75' );
 } );
 
 test( 'out-of-stock simple product is disabled even without cart form', async ( { page } ) => {
 	await open( page, 'outofstock' );
-	await expect( page.locator( '#amc-submit' ) ).toBeDisabled();
-	await expect( page.locator( '#amc-submit' ) ).toHaveText( 'ناموجود' );
+	await expect( page.locator( '#fsvt-submit' ) ).toBeDisabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toHaveText( 'ناموجود' );
 } );
 
 for ( const kind of [ 'protected', 'external', 'home', 'shop', 'cart' ] ) {
 	test( 'no bar or assets on ' + kind, async ( { page } ) => {
 		await page.goto( typeof fixtures[ kind ] === 'string' ? fixtures[ kind ] : fixtures[ kind ].url );
-		await expect( page.locator( '#amc-bar' ) ).toHaveCount( 0 );
-		await expect( page.locator( 'script[src*="abzarak-mobile-cart/assets"]' ) ).toHaveCount( 0 );
+		await expect( page.locator( '#fsvt-bar' ) ).toHaveCount( 0 );
+		await expect( page.locator( 'script[src*="flat-sitcky-vart/assets"]' ) ).toHaveCount( 0 );
 	} );
 }
 
@@ -155,7 +155,7 @@ test( 'native form remains usable when JavaScript is disabled', async ( { browse
 	const context = await browser.newContext( { javaScriptEnabled: false, viewport: { width: 390, height: 844 } } );
 	const page = await context.newPage();
 	await page.goto( fixtures.simple.url );
-	await expect( page.locator( '#amc-submit' ) ).toBeDisabled();
+	await expect( page.locator( '#fsvt-submit' ) ).toBeDisabled();
 	// Like a user scrolling, bring the original form above the fixed footer.
 	await page.locator( 'form.cart' ).evaluate( ( form ) => form.scrollIntoView( { block: 'center' } ) );
 	await page.locator( 'form.cart .single_add_to_cart_button' ).click();

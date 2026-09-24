@@ -1,11 +1,11 @@
 /* Mobile only; do not depend on user-agent detection or scroll position. */
-#amc-bar,
-#amc-spacer {
+#fsvt-bar,
+#fsvt-spacer {
 	display: none;
 }
 
 @media screen and (max-width: 767px) {
-	#amc-bar {
+	#fsvt-bar {
 		box-sizing: border-box;
 		position: fixed;
 		inset-inline: 0;
@@ -27,33 +27,33 @@
 		line-height: 1.6;
 	}
 
-	#amc-bar .amc-price {
+	#fsvt-bar .fsvt-price {
 		min-width: 0;
 		flex: 1 1 45%;
 		overflow-wrap: anywhere;
 	}
 
-	#amc-bar .amc-price-label {
+	#fsvt-bar .fsvt-price-label {
 		display: block;
 		font-size: 11px;
 		color: #595959;
 	}
 
-	#amc-price-value {
+	#fsvt-price-value {
 		font-weight: 700;
 	}
 
-	#amc-price-value del {
+	#fsvt-price-value del {
 		font-size: 12px;
 		font-weight: 400;
 	}
 
-	#amc-price-value ins {
+	#fsvt-price-value ins {
 		background: transparent;
 		text-decoration: none;
 	}
 
-	#amc-submit {
+	#fsvt-submit {
 		appearance: none;
 		box-sizing: border-box;
 		flex: 0 1 55%;
@@ -72,37 +72,37 @@
 		cursor: pointer;
 	}
 
-	#amc-submit:disabled {
+	#fsvt-submit:disabled {
 		background: #e5e7eb;
 		border-color: #d1d5db;
 		color: #595959;
 		cursor: not-allowed;
 	}
 
-	#amc-submit:focus-visible {
+	#fsvt-submit:focus-visible {
 		outline: 3px solid #1a1a1a;
 		outline-offset: 3px;
 	}
 
-	#amc-spacer {
+	#fsvt-spacer {
 		display: block;
-		height: var(--amc-bar-height, 110px);
+		height: var(--fsvt-bar-height, 110px);
 	}
 
 	/* Replace competing theme footer bars only where this purchase bar exists. */
-	body:has(#amc-bar) .sticky-add-to-cart--active,
-	body:has(#amc-bar) .storefront-handheld-footer-bar {
+	body:has(#fsvt-bar) .sticky-add-to-cart--active,
+	body:has(#fsvt-bar) .storefront-handheld-footer-bar {
 		display: none;
 	}
 
-	body:has(#amc-bar) form.cart {
+	body:has(#fsvt-bar) form.cart {
 		scroll-margin-top: 120px;
-		scroll-margin-bottom: var(--amc-bar-height, 110px);
+		scroll-margin-bottom: var(--fsvt-bar-height, 110px);
 	}
 
-	body:has(#amc-bar) form.cart select,
-	body:has(#amc-bar) form.cart input {
+	body:has(#fsvt-bar) form.cart select,
+	body:has(#fsvt-bar) form.cart input {
 		scroll-margin-top: 120px;
-		scroll-margin-bottom: var(--amc-bar-height, 110px);
+		scroll-margin-bottom: var(--fsvt-bar-height, 110px);
 	}
 }

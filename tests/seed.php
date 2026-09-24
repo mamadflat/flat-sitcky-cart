@@ -15,8 +15,8 @@ $fixtures = array();
 
 foreach ( array( 'simple', 'sale', 'outofstock', 'backorder', 'individual', 'protected' ) as $kind ) {
 	$product = new WC_Product_Simple();
-	$product->set_name( 'AMC ' . $kind );
-	$product->set_slug( 'amc-' . $kind );
+	$product->set_name( 'FSVT ' . $kind );
+	$product->set_slug( 'fsvt-' . $kind );
 	$product->set_status( 'publish' );
 	$product->set_regular_price( '100' );
 	$product->set_description( str_repeat( '<p>Product details for scroll verification.</p>', 40 ) );
@@ -43,8 +43,8 @@ foreach ( array( 'simple', 'sale', 'outofstock', 'backorder', 'individual', 'pro
 
 foreach ( array( 'variable', 'defaults', 'ajax' ) as $kind ) {
 	$product = new WC_Product_Variable();
-	$product->set_name( 'AMC ' . $kind );
-	$product->set_slug( 'amc-' . $kind );
+	$product->set_name( 'FSVT ' . $kind );
+	$product->set_slug( 'fsvt-' . $kind );
 	$product->set_status( 'publish' );
 	$values = 'ajax' === $kind ? array_map( 'strval', range( 1, 32 ) ) : array( 'short', 'long', 'unavailable' );
 	$attribute = new WC_Product_Attribute();
@@ -70,7 +70,7 @@ foreach ( array( 'variable', 'defaults', 'ajax' ) as $kind ) {
 }
 
 $external = new WC_Product_External();
-$external->set_name( 'AMC external' );
+$external->set_name( 'FSVT external' );
 $external->set_status( 'publish' );
 $external->set_regular_price( '100' );
 $external->set_product_url( 'https://example.com/' );
@@ -79,5 +79,5 @@ $fixtures['external'] = array( 'id' => $external->get_id(), 'url' => get_permali
 $fixtures['cart'] = wc_get_cart_url();
 $fixtures['shop'] = get_permalink( wc_get_page_id( 'shop' ) );
 $fixtures['home'] = home_url( '/' );
-file_put_contents( getenv( 'AMC_FIXTURES' ), wp_json_encode( $fixtures ) );
+file_put_contents( getenv( 'FSVT_FIXTURES' ), wp_json_encode( $fixtures ) );
 WP_CLI::success( 'Disposable WooCommerce fixtures created.' );
