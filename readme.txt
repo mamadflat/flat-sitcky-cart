@@ -1,4 +1,4 @@
-=== flat-sitcky-vart ===
+=== flat-sitcky-cart ===
 Contributors: mamadflat
 Tags: woocommerce, mobile, cart, sticky
 Requires at least: 6.5
@@ -23,7 +23,7 @@ Keep Flatsome's own Sticky add to cart setting disabled to avoid a separate desk
 
 1. Install and activate WooCommerce.
 2. Upload the ZIP in Plugins > Add New > Upload Plugin.
-3. Activate flat-sitcky-vart.
+3. Activate flat-sitcky-cart.
 4. Visit a simple or variable product on a mobile viewport.
 
 == Frequently Asked Questions ==

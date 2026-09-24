@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<ruleset name="flat-sitcky-vart">
+<ruleset name="flat-sitcky-cart">
   <description>WordPress coding, documentation and security standards.</description>
-  <file>flat-sitcky-vart.php</file>
+  <file>flat-sitcky-cart.php</file>
   <arg name="extensions" value="php"/>
   <arg name="colors"/>
   <rule ref="WordPress"/>
   <config name="minimum_supported_wp_version" value="6.5"/>
   <rule ref="WordPress.WP.I18n">
-    <properties><property name="text_domain" type="array"><element value="flat-sitcky-vart"/></property></properties>
+    <properties><property name="text_domain" type="array"><element value="flat-sitcky-cart"/></property></properties>
   </rule>
   <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-    <properties><property name="prefixes" type="array"><element value="flat_sitcky_vart"/></property></properties>
+    <properties><property name="prefixes" type="array"><element value="flat_sitcky_cart"/></property></properties>
   </rule>
 </ruleset>

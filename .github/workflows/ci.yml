@@ -19,7 +19,7 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: composer:v2
           coverage: none
-      - run: php -l flat-sitcky-vart.php
+      - run: php -l flat-sitcky-cart.php
       - run: composer install --no-interaction --prefer-dist
       - run: composer lint
       - uses: actions/upload-artifact@v4
@@ -65,52 +65,52 @@ jobs:
         env:
           WP_CLI_ALLOW_ROOT: '1'
         run: |
-          mkdir -p /tmp/fsvt-wp
-          wp core download --path=/tmp/fsvt-wp
-          wp config create --path=/tmp/fsvt-wp --dbname=wordpress --dbuser=root --dbpass=wordpress --dbhost=127.0.0.1
-          wp core install --path=/tmp/fsvt-wp --url=http://127.0.0.1:8080 --title='FSVT CI' --admin_user=ci --admin_password='ci-only-password' --admin_email=ci@example.test --skip-email
-          wp plugin install woocommerce --activate --path=/tmp/fsvt-wp
-          wp theme install storefront --activate --path=/tmp/fsvt-wp
-          wp language core install fa_IR --activate --path=/tmp/fsvt-wp
-          wp option update blog_public 0 --path=/tmp/fsvt-wp
-          mkdir -p /tmp/fsvt-wp/wp-content/plugins/flat-sitcky-vart
-          cp flat-sitcky-vart.php readme.txt LICENSE /tmp/fsvt-wp/wp-content/plugins/flat-sitcky-vart/
-          cp -r assets languages /tmp/fsvt-wp/wp-content/plugins/flat-sitcky-vart/
-          wp plugin activate flat-sitcky-vart --path=/tmp/fsvt-wp
-          FSVT_FIXTURES="$GITHUB_WORKSPACE/tests/fixtures.json" wp eval-file "$GITHUB_WORKSPACE/tests/seed.php" --path=/tmp/fsvt-wp
-          wp post update $(wp option get woocommerce_cart_page_id --path=/tmp/fsvt-wp) --post_content='[woocommerce_cart]' --path=/tmp/fsvt-wp
-          wp post update $(wp option get woocommerce_checkout_page_id --path=/tmp/fsvt-wp) --post_content='[woocommerce_checkout]' --path=/tmp/fsvt-wp
+          mkdir -p /tmp/fsct-wp
+          wp core download --path=/tmp/fsct-wp
+          wp config create --path=/tmp/fsct-wp --dbname=wordpress --dbuser=root --dbpass=wordpress --dbhost=127.0.0.1
+          wp core install --path=/tmp/fsct-wp --url=http://127.0.0.1:8080 --title='FSCT CI' --admin_user=ci --admin_password='ci-only-password' --admin_email=ci@example.test --skip-email
+          wp plugin install woocommerce --activate --path=/tmp/fsct-wp
+          wp theme install storefront --activate --path=/tmp/fsct-wp
+          wp language core install fa_IR --activate --path=/tmp/fsct-wp
+          wp option update blog_public 0 --path=/tmp/fsct-wp
+          mkdir -p /tmp/fsct-wp/wp-content/plugins/flat-sitcky-cart
+          cp flat-sitcky-cart.php readme.txt LICENSE /tmp/fsct-wp/wp-content/plugins/flat-sitcky-cart/
+          cp -r assets languages /tmp/fsct-wp/wp-content/plugins/flat-sitcky-cart/
+          wp plugin activate flat-sitcky-cart --path=/tmp/fsct-wp
+          FSCT_FIXTURES="$GITHUB_WORKSPACE/tests/fixtures.json" wp eval-file "$GITHUB_WORKSPACE/tests/seed.php" --path=/tmp/fsct-wp
+          wp post update $(wp option get woocommerce_cart_page_id --path=/tmp/fsct-wp) --post_content='[woocommerce_cart]' --path=/tmp/fsct-wp
+          wp post update $(wp option get woocommerce_checkout_page_id --path=/tmp/fsct-wp) --post_content='[woocommerce_checkout]' --path=/tmp/fsct-wp
           printf 'WordPress: ' > test-environment.txt
-          wp core version --path=/tmp/fsvt-wp >> test-environment.txt
-          wp plugin list --path=/tmp/fsvt-wp --format=table >> test-environment.txt
+          wp core version --path=/tmp/fsct-wp >> test-environment.txt
+          wp plugin list --path=/tmp/fsct-wp --format=table >> test-environment.txt
           php -v >> test-environment.txt
-          php -S 127.0.0.1:8080 -t /tmp/fsvt-wp > /tmp/fsvt-server.log 2>&1 &
+          php -S 127.0.0.1:8080 -t /tmp/fsct-wp > /tmp/fsct-server.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:8080/ >/dev/null && break || sleep 1; done
       - name: WordPress Plugin Check
         run: |
-          wp plugin install plugin-check --activate --path=/tmp/fsvt-wp
-          wp plugin check flat-sitcky-vart --path=/tmp/fsvt-wp --format=json > plugin-check.json
+          wp plugin install plugin-check --activate --path=/tmp/fsct-wp
+          wp plugin check flat-sitcky-cart --path=/tmp/fsct-wp --format=json > plugin-check.json
           node tools/check-plugin-report.cjs
       - run: npm test
       - name: Graceful behavior without WooCommerce
         run: |
-          wp plugin deactivate woocommerce --path=/tmp/fsvt-wp
-          curl -fsS http://127.0.0.1:8080/ > /tmp/fsvt-no-woo.html
-          if grep -q 'id="fsvt-bar"' /tmp/fsvt-no-woo.html; then exit 1; fi
+          wp plugin deactivate woocommerce --path=/tmp/fsct-wp
+          curl -fsS http://127.0.0.1:8080/ > /tmp/fsct-no-woo.html
+          if grep -q 'id="fsct-bar"' /tmp/fsct-no-woo.html; then exit 1; fi
       - name: Package installable plugin
         run: |
-          mkdir -p dist/flat-sitcky-vart
-          cp flat-sitcky-vart.php readme.txt LICENSE dist/flat-sitcky-vart/
-          cp -r assets languages dist/flat-sitcky-vart/
+          mkdir -p dist/flat-sitcky-cart
+          cp flat-sitcky-cart.php readme.txt LICENSE dist/flat-sitcky-cart/
+          cp -r assets languages dist/flat-sitcky-cart/
           cd dist
-          zip -r flat-sitcky-vart-0.1.0.zip flat-sitcky-vart
+          zip -r flat-sitcky-cart-0.1.0.zip flat-sitcky-cart
       - uses: actions/upload-artifact@v4
         with:
-          name: flat-sitcky-vart-plugin
+          name: flat-sitcky-cart-plugin
           path: dist/*.zip
       - name: Collect server log
         if: always()
-        run: cp /tmp/fsvt-server.log ./fsvt-server.log || true
+        run: cp /tmp/fsct-server.log ./fsct-server.log || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -120,4 +120,4 @@ jobs:
             test-results/
             test-environment.txt
             plugin-check.json
-            fsvt-server.log
+            fsct-server.log

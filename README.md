@@ -1,4 +1,4 @@
-# flat-sitcky-vart
+# flat-sitcky-cart
 
 افزونه ووکامرس برای نمایش **قیمت و دکمه خرید ثابت پایین موبایل، از لحظه ورود به صفحه محصول**. در عرض ۷۶۸ پیکسل و بیشتر نوار نمایش داده نمی‌شود.
 
@@ -14,7 +14,7 @@
 
 ## Install
 
-Download the **flat-sitcky-vart-plugin** artifact from a passing GitHub Actions run. Extract the artifact wrapper and upload the contained `flat-sitcky-vart-0.1.0.zip` through WordPress Plugins → Add New → Upload.
+Download the **flat-sitcky-cart-plugin** artifact from a passing GitHub Actions run. Extract the artifact wrapper and upload the contained `flat-sitcky-cart-0.1.0.zip` through WordPress Plugins → Add New → Upload.
 
 Keep Flatsome's native **Sticky add to cart** setting off: that feature is separate and can display on desktop. All custom CSS/JS stays inside this plugin; theme files are untouched. Deactivation removes this feature.
 

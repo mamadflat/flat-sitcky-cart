@@ -3,13 +3,13 @@
 	'use strict';
 
 	$( function () {
-		const bar = document.getElementById( 'fsvt-bar' );
+		const bar = document.getElementById( 'fsct-bar' );
 		if ( ! bar ) {
 			return;
 		}
 
-		const button = document.getElementById( 'fsvt-submit' );
-		const price = document.getElementById( 'fsvt-price-value' );
+		const button = document.getElementById( 'fsct-submit' );
+		const price = document.getElementById( 'fsct-price-value' );
 		const basePrice = price.innerHTML;
 		const product = document.getElementById( 'product-' + bar.dataset.productId );
 		// Scope to the main product, never a related product or a quick-view form.
@@ -21,7 +21,7 @@
 
 		/** Keep the last page content above the bar at all font sizes. */
 		function measure() {
-			document.documentElement.style.setProperty( '--fsvt-bar-height', bar.offsetHeight + 'px' );
+			document.documentElement.style.setProperty( '--fsct-bar-height', bar.offsetHeight + 'px' );
 		}
 		if ( window.ResizeObserver ) {
 			new ResizeObserver( measure ).observe( bar );
@@ -62,13 +62,13 @@
 		}
 
 		if ( variable ) {
-			$( form ).on( 'show_variation.fsvt', function ( event, variation, canPurchase ) {
+			$( form ).on( 'show_variation.fsct', function ( event, variation, canPurchase ) {
 				purchasableVariation = Boolean( canPurchase && variation.is_purchasable && variation.is_in_stock );
 				// This HTML comes from WooCommerce's server-rendered price, not user input.
 				price.innerHTML = variation.price_html || basePrice;
 				sync();
 			} );
-			$( form ).on( 'hide_variation.fsvt reset_data.fsvt', function () {
+			$( form ).on( 'hide_variation.fsct reset_data.fsct', function () {
 				purchasableVariation = false;
 				price.innerHTML = basePrice;
 				sync();
@@ -78,7 +78,7 @@
 		}
 
 		new MutationObserver( sync ).observe( nativeButton, { attributes: true, attributeFilter: [ 'class', 'disabled' ] } );
-		$( document.body ).on( 'added_to_cart.fsvt wc_cart_button_updated.fsvt', function () {
+		$( document.body ).on( 'added_to_cart.fsct wc_cart_button_updated.fsct', function () {
 			busy = false;
 			sync();
 		} );
