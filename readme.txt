@@ -2,7 +2,7 @@
 Contributors: mamadflat
 Tags: woocommerce, mobile, cart, sticky
 Requires at least: 6.5
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
 Stable tag: 0.1.0

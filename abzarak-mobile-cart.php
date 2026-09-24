@@ -23,6 +23,8 @@ defined( 'ABSPATH' ) || exit;
  * @return void
  */
 function abzarak_mc_load_textdomain() {
+	// Private GitHub distribution needs bundled translations, not WordPress.org language packs.
+	// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
 	load_plugin_textdomain( 'abzarak-mobile-cart', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
 add_action( 'init', 'abzarak_mc_load_textdomain' );

@@ -89,7 +89,8 @@ jobs:
       - name: WordPress Plugin Check
         run: |
           wp plugin install plugin-check --activate --path=/tmp/amc-wp
-          wp plugin check abzarak-mobile-cart --path=/tmp/amc-wp
+          wp plugin check abzarak-mobile-cart --path=/tmp/amc-wp --format=json > plugin-check.json
+          node tools/check-plugin-report.cjs
       - run: npm test
       - name: Graceful behavior without WooCommerce
         run: |
@@ -118,4 +119,5 @@ jobs:
             playwright-report/
             test-results/
             test-environment.txt
+            plugin-check.json
             amc-server.log
