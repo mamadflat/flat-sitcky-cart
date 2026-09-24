@@ -188,15 +188,18 @@ test( 'cart state follows selected variation without changing another variation'
   await open( page, 'variable' );
   const select = page.locator( 'select[name="attribute_length"]' );
   await select.selectOption( 'long' );
+  await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
   await page.locator( '#fsct-submit' ).click();
   await expect( page.locator( '#fsct-quantity' ) ).toHaveAttribute( 'data-quantity', '1' );
   await select.selectOption( 'short' );
+  await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
   await expect( page.locator( '#fsct-submit' ) ).toBeVisible();
   await page.locator( '#fsct-submit' ).click();
   await expect( page.locator( '#fsct-quantity' ) ).toHaveAttribute( 'data-quantity', '1' );
   await page.locator( '#fsct-plus' ).click();
   await expect( page.locator( '#fsct-quantity' ) ).toHaveAttribute( 'data-quantity', '2' );
   await select.selectOption( 'long' );
+  await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
   await expect( page.locator( '#fsct-quantity' ) ).toHaveAttribute( 'data-quantity', '1' );
 } );
 
@@ -246,6 +249,7 @@ test( 'admin settings persist; hide only mobile controls and restore desktop', a
     await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
     await expect( page.locator( 'form.cart .quantity' ) ).toBeVisible();
     await page.setViewportSize( { width: 390, height: 844 } );
+    await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
     await page.locator( '#fsct-submit' ).click();
     await expect( page.locator( '#fsct-cart-controls' ) ).toBeVisible();
   } finally { await adminSettings( page, false ); }
