@@ -2,7 +2,7 @@
 /**
  * Plugin Name: flat-sitcky-cart
  * Description: An always-visible mobile price and cart bar using the original WooCommerce product form.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -58,8 +58,25 @@ function flat_sitcky_cart_enqueue_assets() {
 		return;
 	}
 
-	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.1.0' );
-	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery' ), '0.1.0', true );
+	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.2.0' );
+	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery', 'wc-cart-fragments' ), '0.2.0', true );
+	$settings = flat_sitcky_cart_settings();
+	wp_add_inline_style( 'flat-sitcky-cart', '#fsct-bar{--fsct-color:' . $settings['color'] . ';--fsct-text:' . flat_sitcky_cart_text_color( $settings['color'] ) . ';}' );
+	wp_localize_script(
+		'flat-sitcky-cart',
+		'flatSitckyCart',
+		array(
+			'cartApi'      => esc_url_raw( rest_url( 'wc/store/v1/cart' ) ),
+			'hideNative'   => $settings['hide_native'],
+			'success'      => __( 'Your product was added to the cart.', 'flat-sitcky-cart' ),
+			'error'        => __( 'Could not confirm the cart. Please check your cart before trying again.', 'flat-sitcky-cart' ),
+			'updated'      => __( 'Cart quantity updated.', 'flat-sitcky-cart' ),
+			'removed'      => __( 'Product removed from the cart.', 'flat-sitcky-cart' ),
+			'removeLabel'  => __( 'Remove from cart', 'flat-sitcky-cart' ),
+			'decrease'     => __( 'Decrease quantity', 'flat-sitcky-cart' ),
+			'inCart'       => __( 'In your cart', 'flat-sitcky-cart' ),
+		)
+	);
 }
 add_action( 'wp_enqueue_scripts', 'flat_sitcky_cart_enqueue_assets' );
 
@@ -95,9 +112,115 @@ function flat_sitcky_cart_render_bar() {
 			<span id="fsct-price-value"><?php echo wp_kses_post( $price ); ?></span>
 		</div>
 		<button id="fsct-submit" type="button" disabled><?php echo esc_html( $label ); ?></button>
+		<div id="fsct-cart-controls" hidden>
+			<div class="fsct-stepper">
+				<button id="fsct-plus" type="button" aria-label="<?php esc_attr_e( 'Increase quantity', 'flat-sitcky-cart' ); ?>">+</button>
+				<output id="fsct-quantity" aria-live="polite" aria-label="<?php esc_attr_e( 'Quantity in cart', 'flat-sitcky-cart' ); ?>">0</output>
+				<button id="fsct-minus" type="button" aria-label="<?php esc_attr_e( 'Decrease quantity', 'flat-sitcky-cart' ); ?>">−</button>
+			</div>
+			<a href="<?php echo esc_url( wc_get_cart_url() ); ?>"><?php esc_html_e( 'View cart', 'flat-sitcky-cart' ); ?></a>
+		</div>
+		<div id="fsct-status" role="status" aria-live="polite" aria-atomic="true"></div>
 		<noscript><span><?php esc_html_e( 'Use the product form to purchase.', 'flat-sitcky-cart' ); ?></span></noscript>
 	</div>
 	<div id="fsct-spacer" aria-hidden="true"></div>
 	<?php
 }
 add_action( 'wp_footer', 'flat_sitcky_cart_render_bar', 5 );
+
+/**
+ * Get sanitized settings, including safe upgrade defaults.
+ *
+ * @return array Settings.
+ */
+function flat_sitcky_cart_settings() {
+	return flat_sitcky_cart_sanitize_settings( get_option( 'flat_sitcky_cart_settings', array() ) );
+}
+
+/**
+ * Validate Settings API input; never allow arbitrary CSS.
+ *
+ * @param mixed $input Submitted options.
+ * @return array Validated options.
+ */
+function flat_sitcky_cart_sanitize_settings( $input ) {
+	$input = is_array( $input ) ? $input : array();
+	$color = isset( $input['color'] ) && is_string( $input['color'] ) ? sanitize_hex_color( $input['color'] ) : '';
+	return array(
+		'color'       => $color ? $color : '#fec447',
+		'hide_native' => ! empty( $input['hide_native'] ),
+	);
+}
+
+/**
+ * Choose a readable label for the administrator's button color.
+ *
+ * @param string $color Sanitized hexadecimal color.
+ * @return string Black or white label.
+ */
+function flat_sitcky_cart_text_color( $color ) {
+	$hex = ltrim( $color, '#' );
+	if ( 3 === strlen( $hex ) ) {
+		$hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+	}
+	$luminance = 0;
+	foreach ( array( 0.2126, 0.7152, 0.0722 ) as $index => $weight ) {
+		$value      = hexdec( substr( $hex, $index * 2, 2 ) ) / 255;
+		$luminance += $weight * ( $value <= 0.04045 ? $value / 12.92 : pow( ( $value + 0.055 ) / 1.055, 2.4 ) );
+	}
+	return $luminance > 0.179 ? '#111111' : '#ffffff';
+}
+
+/**
+ * Register options with WordPress capability and nonce protection.
+ *
+ * @return void
+ */
+function flat_sitcky_cart_register_settings() {
+	register_setting(
+		'flat_sitcky_cart',
+		'flat_sitcky_cart_settings',
+		array( 'type' => 'array', 'sanitize_callback' => 'flat_sitcky_cart_sanitize_settings', 'default' => array() )
+	);
+}
+add_action( 'admin_init', 'flat_sitcky_cart_register_settings' );
+
+/**
+ * Add the administrator settings screen.
+ *
+ * @return void
+ */
+function flat_sitcky_cart_admin_menu() {
+	add_options_page( 'Flat Sitcky Cart', __( 'Mobile cart bar', 'flat-sitcky-cart' ), 'manage_options', 'flat-sitcky-cart', 'flat_sitcky_cart_settings_page' );
+}
+add_action( 'admin_menu', 'flat_sitcky_cart_admin_menu' );
+
+/**
+ * Render the settings screen. Saving uses options.php and Settings API.
+ *
+ * @return void
+ */
+function flat_sitcky_cart_settings_page() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$settings = flat_sitcky_cart_settings();
+	?>
+	<div class="wrap">
+		<h1><?php esc_html_e( 'Mobile cart bar', 'flat-sitcky-cart' ); ?></h1>
+		<form action="options.php" method="post">
+			<?php settings_fields( 'flat_sitcky_cart' ); ?>
+			<table class="form-table" role="presentation">
+				<tr><th scope="row"><label for="fsct-color"><?php esc_html_e( 'Button color', 'flat-sitcky-cart' ); ?></label></th>
+					<td><input type="color" id="fsct-color" name="flat_sitcky_cart_settings[color]" value="<?php echo esc_attr( $settings['color'] ); ?>"></td></tr>
+				<tr><th scope="row"><?php esc_html_e( 'Mobile product form', 'flat-sitcky-cart' ); ?></th><td>
+					<label><input type="checkbox" name="flat_sitcky_cart_settings[hide_native]" value="1" <?php checked( $settings['hide_native'] ); ?>>
+						<?php esc_html_e( 'Hide the original add-to-cart button and quantity on mobile', 'flat-sitcky-cart' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Only hidden after the sticky bar is ready. Options stay visible; desktop and the no-JavaScript form remain unchanged.', 'flat-sitcky-cart' ); ?></p>
+				</td></tr>
+			</table>
+			<?php submit_button(); ?>
+		</form>
+	</div>
+	<?php
+}

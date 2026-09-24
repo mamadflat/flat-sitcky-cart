@@ -103,7 +103,7 @@ jobs:
           cp flat-sitcky-cart.php readme.txt LICENSE dist/flat-sitcky-cart/
           cp -r assets languages dist/flat-sitcky-cart/
           cd dist
-          zip -r flat-sitcky-cart-0.1.0.zip flat-sitcky-cart
+          zip -r flat-sitcky-cart-0.2.0.zip flat-sitcky-cart
       - uses: actions/upload-artifact@v4
         with:
           name: flat-sitcky-cart-plugin

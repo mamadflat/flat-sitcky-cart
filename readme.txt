@@ -5,7 +5,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,7 @@ The bar and spacer are hidden at 768px and above. The original purchase form is 
 The button says Choose options and focuses the original attribute selector. Once a purchasable variation is selected, it shows Add to cart and uses the selected price.
 
 = Does it work with every product type? =
-Version 0.1.0 supports simple and variable products using classic WooCommerce forms. Grouped, external, subscription, bundle and block-only product forms are not supported. No bar is rendered for password-protected products.
+Version 0.2.0 supports simple and variable products using classic WooCommerce forms. Grouped, external, subscription, bundle and block-only product forms are not supported. No bar is rendered for password-protected products.
 
 = Is Flatsome included? =
 No. Flatsome is a commercial theme. Automated integration tests use Storefront. Validate your licensed Flatsome layout in staging before production installation.
@@ -45,5 +45,5 @@ Deactivate and delete the plugin. It creates no options, tables or stored custom
 
 == Changelog ==
 
-= 0.1.0 =
+= 0.2.0 =
 Initial mobile purchase bar with native WooCommerce form delegation.

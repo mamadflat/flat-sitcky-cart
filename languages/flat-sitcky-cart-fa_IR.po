@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: flat-sitcky-cart 0.1.0\n"
+"Project-Id-Version: flat-sitcky-cart 0.2.0\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,3 +24,48 @@ msgstr "ناموجود"
 
 msgid "Use the product form to purchase."
 msgstr "برای خرید از فرم اصلی محصول استفاده کنید."
+
+msgid "Your product was added to the cart."
+msgstr "محصول شما به سبد خرید اضافه شد."
+
+msgid "Could not confirm the cart. Please check your cart before trying again."
+msgstr "وضعیت سبد تأیید نشد. پیش از تلاش دوباره، سبد خرید را بررسی کنید."
+
+msgid "Cart quantity updated."
+msgstr "تعداد محصول در سبد به‌روز شد."
+
+msgid "Product removed from the cart."
+msgstr "محصول از سبد خرید حذف شد."
+
+msgid "Remove from cart"
+msgstr "حذف از سبد خرید"
+
+msgid "Decrease quantity"
+msgstr "کاهش تعداد"
+
+msgid "Increase quantity"
+msgstr "افزایش تعداد"
+
+msgid "In your cart"
+msgstr "در سبد خرید شما"
+
+msgid "Quantity in cart"
+msgstr "تعداد در سبد خرید"
+
+msgid "View cart"
+msgstr "مشاهده سبد خرید"
+
+msgid "Mobile cart bar"
+msgstr "نوار سبد خرید موبایل"
+
+msgid "Button color"
+msgstr "رنگ دکمه"
+
+msgid "Mobile product form"
+msgstr "فرم محصول در موبایل"
+
+msgid "Hide the original add-to-cart button and quantity on mobile"
+msgstr "مخفی کردن دکمه افزودن به سبد و تعداد اصلی در موبایل"
+
+msgid "Only hidden after the sticky bar is ready. Options stay visible; desktop and the no-JavaScript form remain unchanged."
+msgstr "فقط پس از آماده‌شدن نوار چسبان مخفی می‌شوند. گزینه‌های محصول باقی می‌مانند؛ دسکتاپ و حالت بدون جاوااسکریپت تغییری نمی‌کنند."
