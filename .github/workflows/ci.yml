@@ -91,6 +91,8 @@ jobs:
           wp plugin install plugin-check --activate --path=/tmp/fsct-wp
           wp plugin check flat-sitcky-cart --path=/tmp/fsct-wp --format=json > plugin-check.json
           node tools/check-plugin-report.cjs
+      - name: Settings sanitization checks
+        run: wp eval-file "$GITHUB_WORKSPACE/tests/settings.php" --path=/tmp/fsct-wp
       - run: npm test
       - name: Graceful behavior without WooCommerce
         run: |

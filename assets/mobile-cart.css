@@ -90,8 +90,8 @@
 	}
 
 	/* Replace competing theme footer bars only where this purchase bar exists. */
-	body:has(#fsct-bar) .sticky-add-to-cart--active,
-	body:has(#fsct-bar) .storefront-handheld-footer-bar {
+	body:has(#fsct-bar.fsct-ready) .sticky-add-to-cart--active,
+	body:has(#fsct-bar.fsct-ready) .storefront-handheld-footer-bar {
 		display: none;
 	}
 

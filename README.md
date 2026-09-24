@@ -1,28 +1,33 @@
-# flat-sitcky-cart
+# flat-sitcky-cart 0.2.0
 
-افزونه ووکامرس برای نمایش **قیمت و دکمه خرید ثابت پایین موبایل، از لحظه ورود به صفحه محصول**. در عرض ۷۶۸ پیکسل و بیشتر نوار نمایش داده نمی‌شود.
+نوار خرید موبایل ووکامرس، از لحظه ورود به صفحه محصول، با قیمت، پیام موفقیت و کنترل تعداد واقعی سبد خرید.
 
-## Behavior
+## Settings / تنظیمات
 
-- Fixed bar at up to 767 CSS pixels, without scrolling or user-agent detection.
-- Server-rendered price; purchase action enabled when the original form is ready.
-- Variable products first focus the original option selector, then display the selected variation price.
-- Delegates to the original WooCommerce button: quantities, selected attributes, validation and theme AJAX are preserved.
-- Unavailable products are disabled. Backorders follow WooCommerce's settings.
-- RTL, Persian translation, keyboard focus and a footer spacer sized to the actual bar.
-- No custom cart endpoint, settings, database tables, telemetry or external calls.
+WordPress → Settings → Mobile cart bar (تنظیمات ← نوار سبد خرید موبایل).
 
-## Install
+- **Button color:** native color picker, validated hexadecimal color; contrasting text is calculated automatically.
+- **Hide original button and quantity on mobile:** optional, off by default for safe upgrades. Only the main product form's button and quantity are hidden, below 768px, after the sticky bar and Store API are ready. Attributes remain visible. Desktop, API failure, disabled JavaScript and plugin deactivation retain the original form.
 
-Download the **flat-sitcky-cart-plugin** artifact from a passing GitHub Actions run. Extract the artifact wrapper and upload the contained `flat-sitcky-cart-0.1.0.zip` through WordPress Plugins → Add New → Upload.
+## Cart behavior
 
-Keep Flatsome's native **Sticky add to cart** setting off: that feature is separate and can display on desktop. All custom CSS/JS stays inside this plugin; theme files are untouched. Deactivation removes this feature.
+- Mobile-only fixed bar, RTL support, safe-area padding and a measured footer spacer.
+- Inspired by the observed Digikala mobile purchase pattern: add → confirmed success message → increase/count/decrease (remove at minimum), with price alongside and a cart link. Brand color remains configurable; no third-party assets are copied.
+- Only a confirmed server cart increase produces the success message. Failed stock/validation/network requests show an error and do not increment the displayed quantity optimistically.
+- Sticky purchases submit the original WooCommerce form via AJAX, preserving PHP validation, variation attributes and other form fields. Desktop and native button submissions are not intercepted. Existing theme AJAX is respected when it cancels native submission and emits WooCommerce's added_to_cart event.
+- Cart state/update/remove use the official WooCommerce Store API and its fresh response nonce, quantity limits, stock checks and session cookies. No custom cart mutation endpoint or disabled nonce checks.
+- Cart state is refreshed on entry, bfcache restoration, returning to the tab and native cart events. Variation controls target the selected variation only. Distinct addon lines sharing one product ID are deliberately not merged; use the cart for those configurations.
+- Sold-individually and stock limits disable increment. The last decrement removes the cart line and restores Add to cart.
 
-## Testing
+## Install / update
 
-The workflow runs PHP syntax checks on PHP 7.4 and 8.3, WordPress Coding Standards (WPCS), WordPress Plugin Check, and Playwright against a disposable WordPress + WooCommerce + Storefront installation with MySQL. Product fixtures are generated only in CI. Tests cover real cart submission, quantity validation, variations including AJAX/default selections, reset, stock, backorders, sale pricing, mobile/desktop breakpoints, RTL and unsupported pages.
+Download the ZIP from the GitHub release or the passing **flat-sitcky-cart-plugin** Actions artifact. Upload `flat-sitcky-cart-0.2.0.zip` through Plugins → Add New → Upload; replace the existing version when WordPress prompts. Enable the hide option in settings if desired.
 
-Reports, failure traces/screenshots, environment versions and the installable ZIP are workflow artifacts. Dependencies are lockfile-controlled; WordPress, WooCommerce and Storefront use the available stable versions at execution, recorded in `test-environment.txt`.
+Keep Flatsome's native Sticky add to cart setting off. All new CSS/JS stays inside the plugin. No theme edits are required. Site installation is separate from CI.
+
+## Validation
+
+GitHub Actions installs disposable WordPress, WooCommerce and Storefront with MySQL. It runs PHP 7.4/8.3 syntax and WordPress Coding Standards, Plugin Check, and browser integration tests covering native and AJAX purchase, variants, quantities, errors, settings, mobile/desktop and no-JavaScript fallback. Reports record the installed versions. Production customer data is never used.
 
 ```sh
 composer install
@@ -30,19 +35,18 @@ composer lint
 npm ci
 npm run check:js
 npm run build:translations
-# npm test requires the disposable WordPress setup and tests/fixtures.json from CI.
+# Requires the disposable WordPress environment and tests/fixtures.json:
+npm test
 ```
 
-## Scope and limitations
+## Compatibility
 
-Supports classic simple/variable WooCommerce forms. Flatsome's custom Product Add To Cart element exposes this form. Flatsome is proprietary and is **not bundled or exercised by the Storefront CI tests**; staging verification on the licensed site's layout is required before production deployment. Third-party bundles/subscriptions, block-only forms and custom option widgets need separate compatibility testing. Prices retain WooCommerce's formatting; the plugin never calculates prices itself.
-
-No production site installation is performed by CI.
+Classic simple and variable WooCommerce product forms. Flatsome's classic product form is supported; licensed Flatsome is not bundled in CI. Third-party bundles, subscriptions, file uploads, block-only product forms and custom JS validation widgets require additional compatibility testing. An unavailable Store API restores the native purchase controls. Page caches must exclude cart/REST requests as required by WooCommerce. AJAX native-form submission requires same-origin product form actions.
 
 ## References
 
-- [WordPress PHP coding standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/)
-- [Enqueueing plugin assets](https://developer.wordpress.org/plugins/javascript/enqueuing/)
-- [WooCommerce variation form implementation](https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/client/legacy/js/frontend/add-to-cart-variation.js)
+- https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/cart
+- https://developer.woocommerce.com/docs/apis/store-api/nonce-tokens
+- https://developer.wordpress.org/plugins/settings/settings-api/
 
 License: GPL-2.0-or-later.

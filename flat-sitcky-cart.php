@@ -66,15 +66,15 @@ function flat_sitcky_cart_enqueue_assets() {
 		'flat-sitcky-cart',
 		'flatSitckyCart',
 		array(
-			'cartApi'      => esc_url_raw( rest_url( 'wc/store/v1/cart' ) ),
-			'hideNative'   => $settings['hide_native'],
-			'success'      => __( 'Your product was added to the cart.', 'flat-sitcky-cart' ),
-			'error'        => __( 'Could not confirm the cart. Please check your cart before trying again.', 'flat-sitcky-cart' ),
-			'updated'      => __( 'Cart quantity updated.', 'flat-sitcky-cart' ),
-			'removed'      => __( 'Product removed from the cart.', 'flat-sitcky-cart' ),
-			'removeLabel'  => __( 'Remove from cart', 'flat-sitcky-cart' ),
-			'decrease'     => __( 'Decrease quantity', 'flat-sitcky-cart' ),
-			'inCart'       => __( 'In your cart', 'flat-sitcky-cart' ),
+			'cartApi'     => esc_url_raw( rest_url( 'wc/store/v1/cart' ) ),
+			'hideNative'  => $settings['hide_native'],
+			'success'     => __( 'Your product was added to the cart.', 'flat-sitcky-cart' ),
+			'error'       => __( 'Could not confirm the cart. Please check your cart before trying again.', 'flat-sitcky-cart' ),
+			'updated'     => __( 'Cart quantity updated.', 'flat-sitcky-cart' ),
+			'removed'     => __( 'Product removed from the cart.', 'flat-sitcky-cart' ),
+			'removeLabel' => __( 'Remove from cart', 'flat-sitcky-cart' ),
+			'decrease'    => __( 'Decrease quantity', 'flat-sitcky-cart' ),
+			'inCart'      => __( 'In your cart', 'flat-sitcky-cart' ),
 		)
 	);
 }
@@ -180,7 +180,11 @@ function flat_sitcky_cart_register_settings() {
 	register_setting(
 		'flat_sitcky_cart',
 		'flat_sitcky_cart_settings',
-		array( 'type' => 'array', 'sanitize_callback' => 'flat_sitcky_cart_sanitize_settings', 'default' => array() )
+		array(
+			'type'              => 'array',
+			'sanitize_callback' => 'flat_sitcky_cart_sanitize_settings',
+			'default'           => array(),
+		)
 	);
 }
 add_action( 'admin_init', 'flat_sitcky_cart_register_settings' );
