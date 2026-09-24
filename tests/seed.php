@@ -4,6 +4,9 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 	exit( 1 );
 }
 
+// Keep guest fixtures public even after the first administrator visit.
+update_option( 'woocommerce_coming_soon', 'no' );
+update_option( 'woocommerce_store_pages_only', 'no' );
 update_option( 'woocommerce_currency', 'USD' );
 update_option( 'woocommerce_hide_out_of_stock_items', 'no' );
 update_option( 'woocommerce_cart_redirect_after_add', 'no' );
