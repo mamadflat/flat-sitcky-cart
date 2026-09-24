@@ -13,7 +13,7 @@ update_option( 'woocommerce_show_marketplace_suggestions', 'no' );
 WC_Install::create_pages();
 $fixtures = array();
 
-foreach ( array( 'simple', 'sale', 'outofstock', 'backorder', 'individual', 'protected' ) as $kind ) {
+foreach ( array( 'simple', 'sale', 'outofstock', 'backorder', 'individual', 'protected', 'limited' ) as $kind ) {
 	$product = new WC_Product_Simple();
 	$product->set_name( 'FSCT ' . $kind );
 	$product->set_slug( 'fsct-' . $kind );
@@ -30,6 +30,10 @@ foreach ( array( 'simple', 'sale', 'outofstock', 'backorder', 'individual', 'pro
 		$product->set_manage_stock( true );
 		$product->set_stock_quantity( 0 );
 		$product->set_backorders( 'yes' );
+	}
+	if ( 'limited' === $kind ) {
+		$product->set_manage_stock( true );
+		$product->set_stock_quantity( 2 );
 	}
 	if ( 'individual' === $kind ) {
 		$product->set_sold_individually( true );

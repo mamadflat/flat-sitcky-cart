@@ -265,3 +265,21 @@ test( 'API failure leaves native controls usable even with hide setting enabled'
     await expect( page.locator( '#fsct-submit' ) ).toBeEnabled();
   } finally { await page.unrouteAll(); await adminSettings( page, false ); }
 } );
+
+test( 'real stock cap prevents increasing beyond available stock', async ( { page } ) => {
+  await open( page, 'limited' );
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#fsct-cart-controls' ) ).toBeVisible();
+  await page.locator( '#fsct-plus' ).click();
+  await expect( page.locator( '#fsct-quantity' ) ).toHaveAttribute( 'data-quantity', '2' );
+  await expect( page.locator( '#fsct-plus' ) ).toBeDisabled();
+} );
+
+test( 'failed product POST never claims success or switches to quantity', async ( { page } ) => {
+  await open( page, 'simple' );
+  await page.route( fixtures.simple.url, route => route.request().method() === 'POST' ? route.fulfill( { status: 200, contentType: 'text/html', body: '<ul class="woocommerce-error"><li>Purchase blocked by validation</li></ul>' } ) : route.continue() );
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#fsct-status' ) ).toContainText( 'Purchase blocked by validation' );
+  await expect( page.locator( '#fsct-cart-controls' ) ).toBeHidden();
+  await expect( page.locator( '#fsct-submit' ) ).toBeEnabled();
+} );
