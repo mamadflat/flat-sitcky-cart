@@ -7,9 +7,9 @@
   <rule ref="WordPress"/>
   <config name="minimum_supported_wp_version" value="6.5"/>
   <rule ref="WordPress.WP.I18n">
-    <properties><property name="text_domain" type="array" value="abzarak-mobile-cart"/></properties>
+    <properties><property name="text_domain" type="array"><element value="abzarak-mobile-cart"/></property></properties>
   </rule>
   <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-    <properties><property name="prefixes" type="array" value="amc"/></properties>
+    <properties><property name="prefixes" type="array"><element value="abzarak_mc"/></property></properties>
   </rule>
 </ruleset>

@@ -9,6 +9,7 @@ jobs:
   standards:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         php: ['7.4', '8.3']
     steps:
@@ -21,6 +22,11 @@ jobs:
       - run: php -l abzarak-mobile-cart.php
       - run: composer install --no-interaction --prefer-dist
       - run: composer lint
+      - uses: actions/upload-artifact@v4
+        if: matrix.php == '7.4'
+        with:
+          name: composer-lock
+          path: composer.lock
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -66,7 +72,9 @@ jobs:
           wp theme install storefront --activate --path=/tmp/amc-wp
           wp language core install fa_IR --activate --path=/tmp/amc-wp
           wp option update blog_public 0 --path=/tmp/amc-wp
-          ln -s "$GITHUB_WORKSPACE" /tmp/amc-wp/wp-content/plugins/abzarak-mobile-cart
+          mkdir -p /tmp/amc-wp/wp-content/plugins/abzarak-mobile-cart
+          cp abzarak-mobile-cart.php readme.txt LICENSE /tmp/amc-wp/wp-content/plugins/abzarak-mobile-cart/
+          cp -r assets languages /tmp/amc-wp/wp-content/plugins/abzarak-mobile-cart/
           wp plugin activate abzarak-mobile-cart --path=/tmp/amc-wp
           AMC_FIXTURES="$GITHUB_WORKSPACE/tests/fixtures.json" wp eval-file "$GITHUB_WORKSPACE/tests/seed.php" --path=/tmp/amc-wp
           wp post update $(wp option get woocommerce_cart_page_id --path=/tmp/amc-wp) --post_content='[woocommerce_cart]' --path=/tmp/amc-wp

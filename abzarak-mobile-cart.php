@@ -22,17 +22,17 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return void
  */
-function amc_load_textdomain() {
+function abzarak_mc_load_textdomain() {
 	load_plugin_textdomain( 'abzarak-mobile-cart', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 }
-add_action( 'init', 'amc_load_textdomain' );
+add_action( 'init', 'abzarak_mc_load_textdomain' );
 
 /**
  * Get the queried product without relying on a theme's mutable global product.
  *
  * @return WC_Product|false Supported publicly viewable product, or false.
  */
-function amc_get_product() {
+function abzarak_mc_get_product() {
 	if ( ! function_exists( 'is_product' ) || ! is_product() || post_password_required() ) {
 		return false;
 	}
@@ -51,15 +51,15 @@ function amc_get_product() {
  *
  * @return void
  */
-function amc_enqueue_assets() {
-	if ( ! amc_get_product() ) {
+function abzarak_mc_enqueue_assets() {
+	if ( ! abzarak_mc_get_product() ) {
 		return;
 	}
 
 	wp_enqueue_style( 'abzarak-mobile-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.1.0' );
 	wp_enqueue_script( 'abzarak-mobile-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery' ), '0.1.0', true );
 }
-add_action( 'wp_enqueue_scripts', 'amc_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'abzarak_mc_enqueue_assets' );
 
 /**
  * Render one bar outside theme columns. No cart endpoint or duplicate form is
@@ -67,8 +67,8 @@ add_action( 'wp_enqueue_scripts', 'amc_enqueue_assets' );
  *
  * @return void
  */
-function amc_render_bar() {
-	$product = amc_get_product();
+function abzarak_mc_render_bar() {
+	$product = abzarak_mc_get_product();
 	if ( ! $product ) {
 		return;
 	}
@@ -98,4 +98,4 @@ function amc_render_bar() {
 	<div id="amc-spacer" aria-hidden="true"></div>
 	<?php
 }
-add_action( 'wp_footer', 'amc_render_bar', 5 );
+add_action( 'wp_footer', 'abzarak_mc_render_bar', 5 );
