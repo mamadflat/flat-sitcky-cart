@@ -410,6 +410,11 @@ test( 'v0.3 price animation is user-triggered, tiny and respects reduced motion'
   await expect( page.locator( '#fsct-success' ) ).toHaveCSS( 'animation-name', 'none' );
   await page.locator( '#fsct-success-close' ).click();
   await expect( page.locator( '#fsct-success' ) ).toBeHidden();
+  await page.emulateMedia( { reducedMotion: 'no-preference' } );
+  await open( page, 'ajax' );
+  await page.locator( 'select[name="attribute_length"]' ).selectOption( '2' );
+  await expect( page.locator( '#fsct-price-value' ) ).toContainText( '125' );
+  await expect.poll( () => page.evaluate( () => window.fsctMotion.length ) ).toBeGreaterThan( 0 );
 } );
 
 test( 'v0.3 hidden native selects focus visible swatches; defaults need inspection first', async ( { page } ) => {

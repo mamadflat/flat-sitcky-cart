@@ -57,14 +57,14 @@
 			if ( ! sheet.open ) { sheet.showModal(); }
 			document.documentElement.classList.add( 'fsct-sheet-open' );
 		}
-		function updatePrice( html ) {
+		function updatePrice( html, resolved = true ) {
 			const changed = price.innerHTML !== html;
 			if ( changed ) { price.innerHTML = html; }
-			if ( changed && selectionChanged && mobile.matches && ! reducedMotion.matches && price.animate ) {
+			if ( resolved && changed && selectionChanged && mobile.matches && ! reducedMotion.matches && price.animate ) {
 				if ( priceAnimation ) { priceAnimation.cancel(); }
 				priceAnimation = price.animate( [ { opacity: 0.45, transform: 'translateY(3px)' }, { opacity: 1, transform: 'translateY(0)' } ], { duration: 180, easing: 'ease-out' } );
 			}
-			selectionChanged = false;
+			if ( resolved ) { selectionChanged = false; }
 		}
 
 		function measure() {
@@ -272,7 +272,7 @@
 				updatePrice( variation.price_html || basePrice );
 				sync();
 			} );
-			$( form ).on( 'hide_variation.fsct reset_data.fsct', function () { purchasableVariation = false; updatePrice( basePrice ); sync(); } );
+			$( form ).on( 'hide_variation.fsct reset_data.fsct', function () { purchasableVariation = false; updatePrice( basePrice, false ); sync(); } );
 			$( form ).trigger( 'check_variations' );
 		}
 		new MutationObserver( sync ).observe( nativeButton, { attributes: true, attributeFilter: [ 'class', 'disabled' ] } );
