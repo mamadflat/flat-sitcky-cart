@@ -266,7 +266,11 @@
 		plus.addEventListener( 'click', () => changeQuantity( true ) );
 		minus.addEventListener( 'click', () => changeQuantity( false ) );
 		if ( variable ) {
+			form.addEventListener( 'change', ( event ) => {
+				if ( event.target.matches( '.variations select' ) ) { selectionChanged = true; optionsAcknowledged = true; }
+			}, true );
 			$( form ).on( 'woocommerce_variation_select_change.fsct', () => { selectionChanged = true; optionsAcknowledged = true; } );
+			$( form ).on( 'woocommerce_variation_has_changed.fsct', () => { optionsAcknowledged = true; if ( ! selectedId() ) { selectionChanged = true; } sync(); } );
 			$( form ).on( 'show_variation.fsct', function ( event, variation, canPurchase ) {
 				purchasableVariation = Boolean( canPurchase && variation.is_purchasable && variation.is_in_stock );
 				updatePrice( variation.price_html || basePrice );

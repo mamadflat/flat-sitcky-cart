@@ -361,8 +361,10 @@ test( 'v0.3 confirmed add opens accessible bottom sheet; Escape and cart link wo
   await expect( sheet.locator( '#fsct-success-product' ) ).toContainText( 'FSCT simple' );
   await expect( sheet.locator( 'a' ) ).toHaveAttribute( 'href', fixtures.cart );
   await expect( page.locator( '#fsct-success-close' ) ).toBeFocused();
-  const rect = await sheet.boundingBox();
-  expect( Math.abs( rect.y + rect.height - 844 ) ).toBeLessThan( 2 );
+  await expect.poll( async () => {
+    const rect = await sheet.boundingBox();
+    return Math.abs( rect.y + rect.height - 844 );
+  } ).toBeLessThan( 2 );
   await page.screenshot( { path: 'test-results/mobile-success-sheet.png' } );
   await page.keyboard.press( 'Escape' );
   await expect( sheet ).toBeHidden();
