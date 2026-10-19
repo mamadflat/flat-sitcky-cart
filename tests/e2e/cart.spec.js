@@ -242,12 +242,14 @@ test( 'admin settings persist; hide only mobile controls and restore desktop', a
     await open( page, 'variable' );
     await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeHidden();
     await expect( page.locator( 'form.cart .quantity' ) ).toBeHidden();
+    await expect( page.locator( '.summary > .price' ) ).toBeHidden();
     await expect( page.locator( 'form.cart select' ).first() ).toBeVisible();
     await expect( page.locator( '#fsct-submit' ) ).toHaveCSS( 'background-color', 'rgb(18, 52, 86)' );
     await page.setViewportSize( { width: 1440, height: 900 } );
     await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
     await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
     await expect( page.locator( 'form.cart .quantity' ) ).toBeVisible();
+    await expect( page.locator( '.summary > .price' ) ).toBeVisible();
     await page.setViewportSize( { width: 390, height: 844 } );
     await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
     await page.locator( '#fsct-submit' ).click();
@@ -262,8 +264,57 @@ test( 'API failure leaves native controls usable even with hide setting enabled'
     await page.goto( fixtures.simple.url );
     await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
     await expect( page.locator( 'form.cart .quantity' ) ).toBeVisible();
+    await expect( page.locator( '.summary > .price' ) ).toBeVisible();
     await expect( page.locator( '#fsct-submit' ) ).toBeEnabled();
   } finally { await page.unrouteAll(); await adminSettings( page, false ); }
+} );
+
+test( 'Flatsome prices are replaced without hiding related prices; API failure restores them', async ( { page } ) => {
+  try {
+    await adminSettings( page, true );
+    // Add the UX Builder structure before the real plugin script initializes.
+    await page.route( '**/flat-sitcky-cart/assets/mobile-cart.js*', async route => {
+      const response = await route.fetch();
+      const fixture = `
+        const fixtureRoot = document.querySelector( '[id^="product-"].product' );
+        const fixturePrice = document.createElement( 'div' );
+        fixturePrice.className = 'product-price-container fsct-test-ux-price';
+        fixturePrice.innerHTML = '<div class="price-wrapper"><p class="product-page-price price">100</p></div>';
+        fixtureRoot.prepend( fixturePrice );
+        const fixtureRelated = document.createElement( 'section' );
+        fixtureRelated.className = 'related fsct-test-related';
+        fixtureRelated.innerHTML = '<div class="product"><div class="product-price-container"><p class="product-page-price price">75</p></div></div>';
+        fixtureRoot.append( fixtureRelated );
+      `;
+      await route.fulfill( { response, body: fixture + '\n' + await response.text() } );
+    } );
+    await open( page, 'simple' );
+    await expect( page.locator( '.fsct-test-ux-price' ) ).toBeHidden();
+    await expect( page.locator( '.fsct-test-related .price' ) ).toBeVisible();
+    await expect( page.locator( '.summary > .price' ) ).toBeHidden();
+    await page.setViewportSize( { width: 1440, height: 900 } );
+    await expect( page.locator( '.fsct-test-ux-price' ) ).toBeVisible();
+    await expect( page.locator( '.summary > .price' ) ).toBeVisible();
+    await page.setViewportSize( { width: 390, height: 844 } );
+    await page.route( /.*(?:wc\/store\/v1\/cart|rest_route=.*wc.*store.*cart).*/, route => route.abort() );
+    await page.evaluate( () => window.dispatchEvent( new Event( 'pageshow' ) ) );
+    await expect( page.locator( '#fsct-bar' ) ).not.toHaveClass( /fsct-ready/ );
+    await expect( page.locator( '.fsct-test-ux-price' ) ).toBeVisible();
+    await expect( page.locator( '.summary > .price' ) ).toBeVisible();
+    await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
+  } finally { await page.unrouteAll(); await adminSettings( page, false ); }
+} );
+
+test( 'hide setting still preserves prices and purchase without JavaScript', async ( { browser, page } ) => {
+  let context;
+  try {
+    await adminSettings( page, true );
+    context = await browser.newContext( { javaScriptEnabled: false, viewport: { width: 390, height: 844 } } );
+    const fallback = await context.newPage();
+    await fallback.goto( fixtures.simple.url );
+    await expect( fallback.locator( '.summary > .price' ) ).toBeVisible();
+    await expect( fallback.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
+  } finally { if ( context ) { await context.close(); } await adminSettings( page, false ); }
 } );
 
 test( 'real stock cap prevents increasing beyond available stock', async ( { page } ) => {

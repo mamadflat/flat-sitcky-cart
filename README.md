@@ -1,4 +1,4 @@
-# flat-sitcky-cart 0.2.0
+# flat-sitcky-cart 0.2.1
 
 نوار خرید موبایل ووکامرس، از لحظه ورود به صفحه محصول، با قیمت، پیام موفقیت و کنترل تعداد واقعی سبد خرید.
 
@@ -7,7 +7,7 @@
 WordPress → Settings → Mobile cart bar (تنظیمات ← نوار سبد خرید موبایل).
 
 - **Button color:** native color picker, validated hexadecimal color; contrasting text is calculated automatically.
-- **Hide original button and quantity on mobile:** optional, off by default for safe upgrades. Only the main product form's button and quantity are hidden, below 768px, after the sticky bar and Store API are ready. Attributes remain visible. Desktop, API failure, disabled JavaScript and plugin deactivation retain the original form.
+- **Hide original price, button and quantity on mobile:** optional, off by default for safe upgrades. The main product price (including Flatsome UX Builder price containers and selected-variation prices), button and quantity are hidden below 768px, only after the sticky bar and Store API are ready. Attributes, stock notices, warranty and related-product prices remain visible. Desktop, API failure, disabled JavaScript and plugin deactivation retain the original price and form.
 
 ## Cart behavior
 
@@ -21,7 +21,7 @@ WordPress → Settings → Mobile cart bar (تنظیمات ← نوار سبد �
 
 ## Install / update
 
-Download the ZIP from the GitHub release or the passing **flat-sitcky-cart-plugin** Actions artifact. Upload `flat-sitcky-cart-0.2.0.zip` through Plugins → Add New → Upload; replace the existing version when WordPress prompts. Enable the hide option in settings if desired.
+Download the ZIP from the GitHub release or the passing **flat-sitcky-cart-plugin** Actions artifact. Upload `flat-sitcky-cart-0.2.1.zip` through Plugins → Add New → Upload; replace the existing version when WordPress prompts. Enable the hide option in settings if desired.
 
 Keep Flatsome's native Sticky add to cart setting off. All new CSS/JS stays inside the plugin. No theme edits are required. Site installation is separate from CI.
 

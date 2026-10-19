@@ -126,5 +126,6 @@
   #fsct-status.fsct-error { background: #fff3f2; color: #8e2525; border-color: #edc0bc; }
   /* JS applies this ONLY to the main product form after cart API readiness. */
   form.cart.fsct-native-hidden .single_add_to_cart_button,
-  form.cart.fsct-native-hidden .quantity { display: none !important; }
+  form.cart.fsct-native-hidden .quantity,
+  .single-product .product .fsct-native-price-hidden { display: none !important; }
 }

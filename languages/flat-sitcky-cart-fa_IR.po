@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: flat-sitcky-cart 0.2.0\n"
+"Project-Id-Version: flat-sitcky-cart 0.2.1\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -64,8 +64,8 @@ msgstr "رنگ دکمه"
 msgid "Mobile product form"
 msgstr "فرم محصول در موبایل"
 
-msgid "Hide the original add-to-cart button and quantity on mobile"
-msgstr "مخفی کردن دکمه افزودن به سبد و تعداد اصلی در موبایل"
+msgid "Hide the original price, add-to-cart button and quantity on mobile"
+msgstr "مخفی کردن قیمت، دکمه افزودن به سبد و تعداد اصلی در موبایل"
 
 msgid "Only hidden after the sticky bar is ready. Options stay visible; desktop and the no-JavaScript form remain unchanged."
 msgstr "فقط پس از آماده‌شدن نوار چسبان مخفی می‌شوند. گزینه‌های محصول باقی می‌مانند؛ دسکتاپ و حالت بدون جاوااسکریپت تغییری نمی‌کنند."

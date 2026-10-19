@@ -5,7 +5,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,7 +24,7 @@ Keep Flatsome's own Sticky add to cart setting disabled to avoid a separate desk
 1. Install and activate WooCommerce.
 2. Upload the ZIP in Plugins > Add New > Upload Plugin.
 3. Activate flat-sitcky-cart.
-4. Open Settings > Mobile cart bar to choose the button color and optionally hide the original mobile button and quantity.
+4. Open Settings > Mobile cart bar to choose the button color and optionally hide the original mobile price, button and quantity.
 5. Visit a simple or variable product on a mobile viewport.
 
 == Frequently Asked Questions ==
@@ -45,6 +45,9 @@ No. Flatsome is a commercial theme. Automated integration tests use Storefront. 
 Deactivate and delete the plugin. The styling and hidden controls disappear immediately. One settings option is retained for reinstallation; no custom tables or customer data are created.
 
 == Changelog ==
+
+= 0.2.1 =
+Fix duplicate native product and variation prices when mobile replacement is enabled, including Flatsome UX Builder layouts. Preserve related-product prices, attribute controls, desktop and native fallback after API failure. Bump asset versions to invalidate old caches.
 
 = 0.2.0 =
 Administrator color and mobile-control settings. Confirmed add-to-cart toast, AJAX native-form submission, Store API quantity controls, removal, variation-aware cart state and graceful native fallback.

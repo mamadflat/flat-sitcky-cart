@@ -16,6 +16,11 @@
 		const product = document.getElementById( 'product-' + bar.dataset.productId );
 		const form = product && product.querySelector( 'form.cart' );
 		const nativeButton = form && form.querySelector( '.single_add_to_cart_button' );
+		// Flatsome's UX Builder price lives outside form.cart (and often outside
+		// .summary). Never hide all .price elements: related products keep theirs.
+		const nativePrices = product ? Array.from( product.querySelectorAll(
+			'.product-price-container, .product-page-price, .summary > .price, .summary > .price-wrapper, .woocommerce-variation-price'
+		) ).filter( ( node ) => ! node.closest( '.related, .upsells, .up-sells, .cross-sells' ) ) : [];
 		const variable = bar.dataset.variable === '1';
 		let purchasableVariation = false;
 		let busy = false;
@@ -54,7 +59,9 @@
 			statusTimer = setTimeout( () => { status.textContent = ''; }, error ? 12000 : 5000 );
 		}
 		function hideNative( enabled ) {
-			form.classList.toggle( 'fsct-native-hidden', Boolean( enabled && config.hideNative ) );
+			const hidden = Boolean( enabled && config.hideNative );
+			form.classList.toggle( 'fsct-native-hidden', hidden );
+			nativePrices.forEach( ( node ) => node.classList.toggle( 'fsct-native-price-hidden', hidden ) );
 			bar.classList.toggle( 'fsct-ready', enabled );
 		}
 		function sync() {
