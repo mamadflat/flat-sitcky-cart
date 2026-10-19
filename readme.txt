@@ -5,7 +5,7 @@ Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
 Requires Plugins: woocommerce
-Stable tag: 0.2.2
+Stable tag: 0.3.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ No. Flatsome is a commercial theme. Automated integration tests use Storefront. 
 Deactivate and delete the plugin. The styling and hidden controls disappear immediately. One settings option is retained for reinstallation; no custom tables or customer data are created.
 
 == Changelog ==
+
+= 0.3.0 =
+Compact mobile purchase layout, lightweight price-change feedback and an accessible confirmed-success bottom sheet with cart link. Variable products prompt selection first, including merchant defaults; visible Flatsome swatches receive focus. Reduced-motion support, no animation dependency, and desktop/native fallback preserved.
 
 = 0.2.2 =
 Also hide variation prices created dynamically after an attribute changes; keep the sticky price synchronized and restore native prices on desktop.

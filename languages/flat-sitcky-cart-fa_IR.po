@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: flat-sitcky-cart 0.2.2\n"
+"Project-Id-Version: flat-sitcky-cart 0.3.0\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +54,9 @@ msgstr "تعداد در سبد خرید"
 
 msgid "View cart"
 msgstr "مشاهده سبد خرید"
+
+msgid "Close"
+msgstr "بستن"
 
 msgid "Mobile cart bar"
 msgstr "نوار سبد خرید موبایل"

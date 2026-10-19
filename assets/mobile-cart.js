@@ -12,6 +12,10 @@
 		const minus = document.getElementById( 'fsct-minus' );
 		const quantity = document.getElementById( 'fsct-quantity' );
 		const status = document.getElementById( 'fsct-status' );
+		const sheet = document.getElementById( 'fsct-success' );
+		const sheetClose = document.getElementById( 'fsct-success-close' );
+		const mobile = window.matchMedia( '(max-width: 767px)' );
+		const reducedMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' );
 		const basePrice = price.innerHTML;
 		const product = document.getElementById( 'product-' + bar.dataset.productId );
 		const form = product && product.querySelector( 'form.cart' );
@@ -26,12 +30,42 @@
 		let busy = false;
 		let ready = false;
 		let pending = false;
+		let confirming = false;
+		let pendingTimer;
 		let beforeQuantity = 0;
 		let pendingId = 0;
 		let nonce = '';
 		let items = [];
 		let requestVersion = 0;
 		let statusTimer;
+		let selectionChanged = false;
+		let priceAnimation;
+		let optionsAcknowledged = ! variable;
+
+		function closeSheet() { if ( sheet && sheet.open ) { sheet.close(); } }
+		if ( sheet && sheetClose ) {
+			sheetClose.addEventListener( 'click', closeSheet );
+			sheet.addEventListener( 'click', ( event ) => { if ( event.target === sheet ) { const rect = sheet.getBoundingClientRect(); if ( event.clientY < rect.top || event.clientX < rect.left || event.clientX > rect.right ) { closeSheet(); } } } );
+			sheet.addEventListener( 'close', () => {
+				document.documentElement.classList.remove( 'fsct-sheet-open' );
+				if ( mobile.matches ) { ( controls.hidden ? button : plus ).focus( { preventScroll: true } ); }
+			} );
+			mobile.addEventListener( 'change', () => { if ( ! mobile.matches ) { closeSheet(); } } );
+		}
+		function showSuccess() {
+			if ( ! sheet || ! mobile.matches || typeof sheet.showModal !== 'function' ) { return; }
+			if ( ! sheet.open ) { sheet.showModal(); }
+			document.documentElement.classList.add( 'fsct-sheet-open' );
+		}
+		function updatePrice( html ) {
+			const changed = price.innerHTML !== html;
+			if ( changed ) { price.innerHTML = html; }
+			if ( changed && selectionChanged && mobile.matches && ! reducedMotion.matches && price.animate ) {
+				if ( priceAnimation ) { priceAnimation.cancel(); }
+				priceAnimation = price.animate( [ { opacity: 0.45, transform: 'translateY(3px)' }, { opacity: 1, transform: 'translateY(0)' } ], { duration: 180, easing: 'ease-out' } );
+			}
+			selectionChanged = false;
+		}
 
 		function measure() {
 			document.documentElement.style.setProperty( '--fsct-bar-height', bar.offsetHeight + 'px' );
@@ -46,7 +80,7 @@
 		function selectedId() {
 			return Number( variable ? form.querySelector( '[name="variation_id"]' )?.value : bar.dataset.productId );
 		}
-		function needsOptions() { return variable && ! selectedId(); }
+		function needsOptions() { return variable && ( ! selectedId() || ! optionsAcknowledged ); }
 		// Never combine distinct addon/configuration lines into one editable item.
 		function currentItem() {
 			const matches = items.filter( ( item ) => item.id === selectedId() );
@@ -67,7 +101,7 @@
 		function sync() {
 			const choose = needsOptions();
 			const unavailable = ! choose && ( nativeButton.disabled || nativeButton.classList.contains( 'disabled' ) || ( variable && ! purchasableVariation ) );
-			const item = currentItem();
+			const item = choose ? null : currentItem();
 			button.textContent = choose ? bar.dataset.chooseLabel : ( unavailable ? bar.dataset.unavailableLabel : bar.dataset.addLabel );
 			button.disabled = busy || unavailable;
 			button.hidden = Boolean( item && ready );
@@ -91,7 +125,17 @@
 		function revealOptions() {
 			const selects = Array.from( form.querySelectorAll( '.variations select' ) );
 			const target = selects.find( ( select ) => ! select.value ) || selects[ 0 ];
-			if ( target ) { target.scrollIntoView( { block: 'center' } ); target.focus( { preventScroll: true } ); }
+			if ( ! target ) { return; }
+			// Flatsome hides native selects behind accessible swatches. Scroll to the
+			// attribute row and focus a visible choice rather than an invisible select.
+			const row = target.closest( 'tr' ) || target.parentElement;
+			const candidates = [ target, ...row.querySelectorAll( '[role="radio"], button, input' ) ];
+			const focusTarget = candidates.find( ( node ) => ! node.disabled && node.getClientRects().length && getComputedStyle( node ).visibility !== 'hidden' );
+			row.scrollIntoView( { block: 'center', behavior: reducedMotion.matches ? 'instant' : 'smooth' } );
+			if ( focusTarget ) { focusTarget.focus( { preventScroll: true } ); }
+			// Existing merchant defaults are retained, but never bought on the first
+			// sticky click: the shopper is taken to inspect them before purchasing.
+			if ( selectedId() ) { optionsAcknowledged = true; sync(); }
 		}
 		// Cart state and mutation are handled by WooCommerce Store API, including
 		// session ownership, nonce checks, stock and quantity limits. Never cache.
@@ -134,15 +178,20 @@
 		}
 		function refreshFragments() { $( document.body ).trigger( 'wc_fragment_refresh' ); }
 		async function confirmAdded() {
-			if ( ! pending ) { return; }
+			if ( ! pending || confirming ) { return; }
+			confirming = true;
 			await refresh();
 			const total = items.filter( ( item ) => item.id === pendingId ).reduce( ( sum, item ) => sum + item.quantity, 0 );
-			announce( ready && total > beforeQuantity ? config.success : config.error, ! ready || total <= beforeQuantity );
+			const added = ready && total > beforeQuantity;
+			announce( added ? config.success : config.error, ! added );
 			pending = false;
+			confirming = false;
+			clearTimeout( pendingTimer );
 			busy = false;
 			sync();
 			refreshFragments();
 			if ( ! controls.hidden ) { plus.focus( { preventScroll: true } ); }
+			if ( added ) { showSuccess(); }
 		}
 		// Only the sticky button opts into AJAX. The actual native form is posted,
 		// retaining variation attributes, quantity, addons and PHP validations.
@@ -160,6 +209,7 @@
 				await confirmAdded();
 			} catch ( error ) {
 				pending = false;
+				clearTimeout( pendingTimer );
 				busy = false;
 				announce( error.message || config.error, true );
 				await refresh();
@@ -185,7 +235,8 @@
 			busy = true;
 			sync();
 			nativeButton.click();
-			setTimeout( () => {
+			clearTimeout( pendingTimer );
+			pendingTimer = setTimeout( () => {
 				if ( pending ) { pending = false; busy = false; announce( config.error, true ); refresh(); }
 			}, 35000 );
 		} );
@@ -215,12 +266,13 @@
 		plus.addEventListener( 'click', () => changeQuantity( true ) );
 		minus.addEventListener( 'click', () => changeQuantity( false ) );
 		if ( variable ) {
+			$( form ).on( 'woocommerce_variation_select_change.fsct', () => { selectionChanged = true; optionsAcknowledged = true; } );
 			$( form ).on( 'show_variation.fsct', function ( event, variation, canPurchase ) {
 				purchasableVariation = Boolean( canPurchase && variation.is_purchasable && variation.is_in_stock );
-				price.innerHTML = variation.price_html || basePrice;
+				updatePrice( variation.price_html || basePrice );
 				sync();
 			} );
-			$( form ).on( 'hide_variation.fsct reset_data.fsct', function () { purchasableVariation = false; price.innerHTML = basePrice; sync(); } );
+			$( form ).on( 'hide_variation.fsct reset_data.fsct', function () { purchasableVariation = false; updatePrice( basePrice ); sync(); } );
 			$( form ).trigger( 'check_variations' );
 		}
 		new MutationObserver( sync ).observe( nativeButton, { attributes: true, attributeFilter: [ 'class', 'disabled' ] } );

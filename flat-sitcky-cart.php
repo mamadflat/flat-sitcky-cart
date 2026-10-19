@@ -2,7 +2,7 @@
 /**
  * Plugin Name: flat-sitcky-cart
  * Description: An always-visible mobile price and cart bar using the original WooCommerce product form.
- * Version: 0.2.2
+ * Version: 0.3.0
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -59,10 +59,10 @@ function flat_sitcky_cart_enqueue_assets() {
 		return;
 	}
 
-	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.2.2' );
-	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery', 'wc-cart-fragments' ), '0.2.2', true );
+	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.3.0' );
+	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery', 'wc-cart-fragments' ), '0.3.0', true );
 	$settings = flat_sitcky_cart_settings();
-	wp_add_inline_style( 'flat-sitcky-cart', '#fsct-bar{--fsct-color:' . $settings['color'] . ';--fsct-text:' . flat_sitcky_cart_text_color( $settings['color'] ) . ';}' );
+	wp_add_inline_style( 'flat-sitcky-cart', '#fsct-bar,#fsct-success{--fsct-color:' . $settings['color'] . ';--fsct-text:' . flat_sitcky_cart_text_color( $settings['color'] ) . ';}' );
 	wp_localize_script(
 		'flat-sitcky-cart',
 		'flatSitckyCart',
@@ -125,6 +125,16 @@ function flat_sitcky_cart_render_bar() {
 		<noscript><span><?php esc_html_e( 'Use the product form to purchase.', 'flat-sitcky-cart' ); ?></span></noscript>
 	</div>
 	<div id="fsct-spacer" aria-hidden="true"></div>
+	<dialog id="fsct-success" aria-labelledby="fsct-success-title" aria-describedby="fsct-success-product">
+		<div class="fsct-sheet-handle" aria-hidden="true"></div>
+		<button id="fsct-success-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'flat-sitcky-cart' ); ?>" autofocus><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+		<div class="fsct-success-heading">
+			<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+			<h2 id="fsct-success-title"><?php esc_html_e( 'Your product was added to the cart.', 'flat-sitcky-cart' ); ?></h2>
+		</div>
+		<p id="fsct-success-product"><?php echo esc_html( $product->get_name() ); ?></p>
+		<a class="fsct-view-cart" href="<?php echo esc_url( wc_get_cart_url() ); ?>"><?php esc_html_e( 'View cart', 'flat-sitcky-cart' ); ?></a>
+	</dialog>
 	<?php
 }
 add_action( 'wp_footer', 'flat_sitcky_cart_render_bar', 5 );

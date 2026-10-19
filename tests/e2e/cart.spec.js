@@ -3,6 +3,16 @@ const fixtures = require( '../fixtures.json' );
 const add = 'افزودن به سبد خرید';
 const choose = 'انتخاب گزینه‌ها';
 
+// Legacy cart scenarios keep testing underlying quantities after dismissing
+// the new confirmation. Dedicated v0.3 tests exercise the dialog itself.
+test.beforeEach( async ( { page }, info ) => {
+  if ( ! info.title.startsWith( 'v0.3' ) ) {
+    await page.addLocatorHandler( page.locator( '#fsct-success[open]' ), async () => {
+      await page.locator( '#fsct-success-close' ).click();
+    } );
+  }
+} );
+
 async function open( page, kind ) {
 	await page.goto( fixtures[ kind ].url );
 	await expect( page.locator( '#fsct-bar' ) ).toBeVisible();
@@ -109,6 +119,8 @@ test( 'unavailable variation cannot be purchased', async ( { page } ) => {
 
 test( 'default variation resolves after initialization', async ( { page } ) => {
 	await open( page, 'defaults' );
+	await expect( page.locator( '#fsct-submit' ) ).toHaveText( choose );
+	await page.locator( '#fsct-submit' ).click();
 	await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
 	await expect( page.locator( '#fsct-price-value' ) ).toContainText( '125' );
 } );
@@ -337,4 +349,96 @@ test( 'failed product POST never claims success or switches to quantity', async 
   await expect( page.locator( '#fsct-status' ) ).toContainText( 'Purchase blocked by validation' );
   await expect( page.locator( '#fsct-cart-controls' ) ).toBeHidden();
   await expect( page.locator( '#fsct-submit' ) ).toBeEnabled();
+} );
+
+test( 'v0.3 confirmed add opens accessible bottom sheet; Escape and cart link work', async ( { page } ) => {
+  await open( page, 'simple' );
+  const sheet = page.locator( '#fsct-success' );
+  await expect( sheet ).toBeHidden();
+  await page.locator( '#fsct-submit' ).click();
+  await expect( sheet ).toBeVisible();
+  await expect( page.getByRole( 'dialog' ) ).toHaveAccessibleName( 'محصول شما به سبد خرید اضافه شد.' );
+  await expect( sheet.locator( '#fsct-success-product' ) ).toContainText( 'FSCT simple' );
+  await expect( sheet.locator( 'a' ) ).toHaveAttribute( 'href', fixtures.cart );
+  await expect( page.locator( '#fsct-success-close' ) ).toBeFocused();
+  const rect = await sheet.boundingBox();
+  expect( Math.abs( rect.y + rect.height - 844 ) ).toBeLessThan( 2 );
+  await page.screenshot( { path: 'test-results/mobile-success-sheet.png' } );
+  await page.keyboard.press( 'Escape' );
+  await expect( sheet ).toBeHidden();
+  await expect( page.locator( '#fsct-plus' ) ).toBeFocused();
+  await page.locator( '#fsct-minus' ).click();
+  await expect( page.locator( '#fsct-submit' ) ).toBeVisible();
+  await page.locator( '#fsct-submit' ).click();
+  await expect( sheet ).toBeVisible();
+  await sheet.locator( 'a' ).click();
+  await expect( page ).toHaveURL( fixtures.cart );
+  await expect( page.locator( 'main' ) ).toContainText( 'FSCT simple' );
+} );
+
+test( 'v0.3 failure never opens success sheet', async ( { page } ) => {
+  await open( page, 'simple' );
+  await page.route( fixtures.simple.url, route => route.request().method() === 'POST' ? route.fulfill( { status: 500, body: 'Error' } ) : route.continue() );
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#fsct-status' ) ).toHaveClass( /fsct-error/ );
+  await expect( page.locator( '#fsct-success' ) ).toBeHidden();
+} );
+
+test( 'v0.3 price animation is user-triggered, tiny and respects reduced motion', async ( { page } ) => {
+  // Record the real Web Animations calls without replacing their behavior.
+  await page.addInitScript( () => {
+    window.fsctMotion = [];
+    const animate = Element.prototype.animate;
+    Element.prototype.animate = function ( frames, options ) {
+      if ( this.id === 'fsct-price-value' ) { window.fsctMotion.push( options ); }
+      return animate.call( this, frames, options );
+    };
+  } );
+  await open( page, 'variable' );
+  expect( await page.evaluate( () => window.fsctMotion.length ) ).toBe( 0 );
+  await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
+  await expect( page.locator( '#fsct-price-value' ) ).toContainText( '125' );
+  await expect.poll( () => page.evaluate( () => window.fsctMotion.length ) ).toBeGreaterThan( 0 );
+  expect( await page.evaluate( () => window.fsctMotion.every( item => item.duration <= 200 ) ) ).toBe( true );
+  const count = await page.evaluate( () => window.fsctMotion.length );
+  await page.emulateMedia( { reducedMotion: 'reduce' } );
+  await page.locator( 'select[name="attribute_length"]' ).selectOption( 'short' );
+  await expect( page.locator( '#fsct-price-value' ) ).toContainText( '100' );
+  expect( await page.evaluate( () => window.fsctMotion.length ) ).toBe( count );
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#fsct-success' ) ).toBeVisible();
+  await expect( page.locator( '#fsct-success' ) ).toHaveCSS( 'animation-name', 'none' );
+  await page.locator( '#fsct-success-close' ).click();
+  await expect( page.locator( '#fsct-success' ) ).toBeHidden();
+} );
+
+test( 'v0.3 hidden native selects focus visible swatches; defaults need inspection first', async ( { page } ) => {
+  await open( page, 'defaults' );
+  await expect( page.locator( '#fsct-submit' ) ).toHaveText( choose );
+  // Realistic Flatsome accessibility structure, without bundling a paid theme.
+  await page.evaluate( () => {
+    const select = document.querySelector( '.variations select' );
+    select.style.display = 'none';
+    const swatch = document.createElement( 'button' );
+    swatch.type = 'button'; swatch.setAttribute( 'role', 'radio' ); swatch.textContent = 'Long'; swatch.id = 'test-swatch';
+    select.parentElement.append( swatch );
+  } );
+  await page.locator( '#fsct-spacer' ).scrollIntoViewIfNeeded();
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#test-swatch' ) ).toBeFocused();
+  await expect( page.locator( '#test-swatch' ) ).toBeInViewport();
+  await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
+  await expect( page.locator( '#fsct-success' ) ).toBeHidden();
+} );
+
+test( 'v0.3 sheet closes on desktop resize and does not leak to archives', async ( { page } ) => {
+  await open( page, 'simple' );
+  await page.locator( '#fsct-submit' ).click();
+  await expect( page.locator( '#fsct-success' ) ).toBeVisible();
+  await page.setViewportSize( { width: 1440, height: 900 } );
+  await expect( page.locator( '#fsct-success' ) ).not.toHaveAttribute( 'open', '' );
+  await expect( page.locator( '#fsct-bar' ) ).toBeHidden();
+  await expect( page.locator( 'html' ) ).not.toHaveClass( /fsct-sheet-open/ );
+  await page.goto( fixtures.home );
+  await expect( page.locator( '#fsct-success' ) ).toHaveCount( 0 );
 } );

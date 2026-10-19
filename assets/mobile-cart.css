@@ -1,6 +1,7 @@
 /* Mobile only; do not depend on user-agent detection or scroll position. */
 #fsct-bar,
-#fsct-spacer {
+#fsct-spacer,
+#fsct-success {
 	display: none;
 }
 
@@ -15,13 +16,13 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px;
-		padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-		padding-inline-start: max(16px, env(safe-area-inset-left, 0px));
-		padding-inline-end: max(16px, env(safe-area-inset-right, 0px));
-		border-top: 1px solid #e5e7eb;
+		padding: 10px 15px calc(10px + env(safe-area-inset-bottom, 0px));
+		padding-inline-start: max(15px, env(safe-area-inset-left, 0px));
+		padding-inline-end: max(15px, env(safe-area-inset-right, 0px));
+		border-top: 1px solid #e3e8f2;
 		background: #fff;
-		color: #1a1a1a;
-		box-shadow: 0 -3px 16px rgb(0 0 0 / 8%);
+		color: #142542;
+		box-shadow: 0 -2px 10px rgb(16 37 68 / 5%);
 		font-family: inherit;
 		font-size: 14px;
 		line-height: 1.6;
@@ -40,8 +41,13 @@
 	}
 
 	#fsct-price-value {
+		display: inline-block;
 		font-weight: 700;
+		font-size: 15px;
+		line-height: 1.7;
 	}
+	#fsct-price-value .woocommerce-Price-currencySymbol { font-size: 11px; font-weight: 400; }
+	#fsct-price-value .screen-reader-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 
 	#fsct-price-value del {
 		font-size: 12px;
@@ -61,10 +67,11 @@
 		margin: 0;
 		padding: 10px 16px;
 		border: 1px solid #e7af24;
-		border-radius: 10px;
+		border-radius: 8px;
 		background: #fec447;
 		color: #1a1a1a;
 		font: inherit;
+		font-size: 12px;
 		font-weight: 700;
 		letter-spacing: normal;
 		text-transform: none;
@@ -112,7 +119,7 @@
 #fsct-status:empty { display: none; }
 @media screen and (max-width: 767px) {
   #fsct-bar .fsct-price { order: 2; text-align: end; }
-  #fsct-submit, #fsct-cart-controls { order: 1; flex: 0 1 52%; }
+  #fsct-submit, #fsct-cart-controls { order: 1; flex: 0 0 48%; }
   #fsct-submit { background: var(--fsct-color, #fec447); border-color: var(--fsct-color, #fec447); color: var(--fsct-text, #111); }
   #fsct-submit:disabled { background: #e5e7eb; border-color: #d1d5db; color: #595959; }
   #fsct-cart-controls { min-width: 0; text-align: center; }
@@ -129,4 +136,34 @@
   form.cart.fsct-native-hidden .quantity,
   form.cart.fsct-native-hidden .woocommerce-variation-price,
   .single-product .product .fsct-native-price-hidden { display: none !important; }
+}
+
+/* Native dialog supplies focus containment, Escape and inert background without
+   a modal library. Only transform/opacity move: no layout animation or polling. */
+#fsct-success:not([open]) { display: none; }
+@media screen and (max-width: 767px) {
+  html.fsct-sheet-open { overflow: hidden; }
+  #fsct-success[open] {
+    display: block; box-sizing: border-box; position: fixed;
+    inset: auto 0 0; width: 100%; max-width: 540px; max-height: 80dvh;
+    margin: 0 auto; padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+    border: 0; border-radius: 18px 18px 0 0; background: #fff; color: #142542;
+    box-shadow: 0 -14px 34px rgb(16 37 68 / 16%); font: inherit;
+    animation: fsct-sheet-in 180ms ease-out;
+  }
+  #fsct-success::backdrop { background: rgb(20 37 66 / 35%); animation: fsct-backdrop-in 180ms ease-out; }
+  #fsct-success .fsct-sheet-handle { width: 36px; height: 4px; border-radius: 4px; margin: 0 auto 20px; background: #e3e8f2; }
+  #fsct-success-close { position: absolute; inset-inline-end: 8px; top: 16px; display: grid; place-items: center; width: 44px; height: 44px; min-width: 44px; margin: 0; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #64748b; box-shadow: none; cursor: pointer; }
+  #fsct-success .fsct-success-heading { display: flex; align-items: center; gap: 8px; padding-inline-end: 28px; }
+  #fsct-success .fsct-success-heading svg { flex: 0 0 28px; color: #208749; }
+  #fsct-success-title { margin: 0; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.8; color: #142542; }
+  #fsct-success-product { margin: 16px 0 20px; font-size: 12px; line-height: 1.9; color: #64748b; overflow-wrap: anywhere; }
+  #fsct-success .fsct-view-cart { display: flex; align-items: center; justify-content: center; box-sizing: border-box; min-height: 48px; width: 100%; padding: 12px 16px; border-radius: 8px; background: var(--fsct-color, #fec447); color: var(--fsct-text, #111); text-decoration: none; font-size: 12px; font-weight: 700; }
+  #fsct-success :focus-visible { outline: 2px solid #142542; outline-offset: 2px; }
+  html.fsct-sheet-open #fsct-status { visibility: hidden; }
+}
+@keyframes fsct-sheet-in { from { opacity: .5; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fsct-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  #fsct-success[open], #fsct-success::backdrop { animation: none; }
 }

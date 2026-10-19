@@ -1,4 +1,4 @@
-# flat-sitcky-cart 0.2.2
+# flat-sitcky-cart 0.3.0
 
 نوار خرید موبایل ووکامرس، از لحظه ورود به صفحه محصول، با قیمت، پیام موفقیت و کنترل تعداد واقعی سبد خرید.
 
@@ -21,7 +21,11 @@ WordPress → Settings → Mobile cart bar (تنظیمات ← نوار سبد �
 
 ## Install / update
 
-Download the ZIP from the GitHub release or the passing **flat-sitcky-cart-plugin** Actions artifact. Upload `flat-sitcky-cart-0.2.2.zip` through Plugins → Add New → Upload; replace the existing version when WordPress prompts. Enable the hide option in settings if desired.
+Download the ZIP from the GitHub release or the passing **flat-sitcky-cart-plugin** Actions artifact. Upload `flat-sitcky-cart-0.3.0.zip` through Plugins → Add New → Upload; replace the existing version when WordPress prompts. Enable the hide option in settings if desired.
+
+## Mobile interaction design (0.3.0)
+
+See [the design and QA contract](docs/mobile-purchase-0.3.md) for layout dimensions, motion, variation selection and accessible confirmation behavior. No external animation library, font, icon asset or tracking is added.
 
 Keep Flatsome's native Sticky add to cart setting off. All new CSS/JS stays inside the plugin. No theme edits are required. Site installation is separate from CI.
 
