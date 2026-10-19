@@ -127,5 +127,6 @@
   /* JS applies this ONLY to the main product form after cart API readiness. */
   form.cart.fsct-native-hidden .single_add_to_cart_button,
   form.cart.fsct-native-hidden .quantity,
+  form.cart.fsct-native-hidden .woocommerce-variation-price,
   .single-product .product .fsct-native-price-hidden { display: none !important; }
 }

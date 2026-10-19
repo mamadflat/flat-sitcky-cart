@@ -2,7 +2,7 @@
 /**
  * Plugin Name: flat-sitcky-cart
  * Description: An always-visible mobile price and cart bar using the original WooCommerce product form.
- * Version: 0.2.1
+ * Version: 0.2.2
  * Requires at least: 6.5
  * Requires PHP: 7.4
  * Requires Plugins: woocommerce
@@ -59,8 +59,8 @@ function flat_sitcky_cart_enqueue_assets() {
 		return;
 	}
 
-	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.2.1' );
-	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery', 'wc-cart-fragments' ), '0.2.1', true );
+	wp_enqueue_style( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.css', __FILE__ ), array(), '0.2.2' );
+	wp_enqueue_script( 'flat-sitcky-cart', plugins_url( 'assets/mobile-cart.js', __FILE__ ), array( 'jquery', 'wc-cart-fragments' ), '0.2.2', true );
 	$settings = flat_sitcky_cart_settings();
 	wp_add_inline_style( 'flat-sitcky-cart', '#fsct-bar{--fsct-color:' . $settings['color'] . ';--fsct-text:' . flat_sitcky_cart_text_color( $settings['color'] ) . ';}' );
 	wp_localize_script(

@@ -245,11 +245,15 @@ test( 'admin settings persist; hide only mobile controls and restore desktop', a
     await expect( page.locator( '.summary > .price' ) ).toBeHidden();
     await expect( page.locator( 'form.cart select' ).first() ).toBeVisible();
     await expect( page.locator( '#fsct-submit' ) ).toHaveCSS( 'background-color', 'rgb(18, 52, 86)' );
+    await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
+    await expect( page.locator( '.woocommerce-variation-price' ) ).toBeHidden();
+    await expect( page.locator( '#fsct-price-value' ) ).toContainText( '125' );
     await page.setViewportSize( { width: 1440, height: 900 } );
     await page.locator( 'select[name="attribute_length"]' ).selectOption( 'long' );
     await expect( page.locator( 'form.cart .single_add_to_cart_button' ) ).toBeVisible();
     await expect( page.locator( 'form.cart .quantity' ) ).toBeVisible();
     await expect( page.locator( '.summary > .price' ) ).toBeVisible();
+    await expect( page.locator( '.woocommerce-variation-price' ) ).toBeVisible();
     await page.setViewportSize( { width: 390, height: 844 } );
     await expect( page.locator( '#fsct-submit' ) ).toHaveText( add );
     await page.locator( '#fsct-submit' ).click();

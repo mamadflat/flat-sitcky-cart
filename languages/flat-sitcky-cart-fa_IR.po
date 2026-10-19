@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: flat-sitcky-cart 0.2.1\n"
+"Project-Id-Version: flat-sitcky-cart 0.2.2\n"
 "Language: fa_IR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
